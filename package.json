@@ -7,8 +7,14 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@vueuse/core": "^4.11.0",
+    "@vueuse/integrations": "^4.11.0",
+    "axios": "^0.21.1",
     "core-js": "^3.6.5",
+    "lodash": "^4.17.21",
+    "universal-cookie": "^4.0.4",
     "vue": "^3.0.0",
+    "vue-cookies": "^1.7.4",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.0-0"
   },
