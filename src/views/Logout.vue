@@ -17,30 +17,11 @@ export default {
   setup() {
     // Vuex: Check if user is logged in
     const store = useStore()
-    // const { logged_in } = useState(['logged_in'])
     const token = computed(() => store.state.auth.token)
 
-
-    // // Logout
-    // const cookies = useCookies(['locale'])
-    // const csrftoken = cookies.get('csrftoken')
-
+    // Logout
     const onClickLogout = () => {
-    //   axios({
-    //     method: 'post',
-    //     url: 'api/accounts/logout/',
-    //     data: {csrftoken},
-    //     headers: {
-    //       'Content-Type': 'application/json'
-    //     }
-    //   })
-    //     .then((res) => {
-    //       // console.log(res)
-          store.dispatch('auth/logout')
-    //     })
-    //     .catch((err) => {
-    //       console.log(err)
-    //     })
+      store.dispatch('auth/logout')
     }
 
     return {

@@ -18,12 +18,11 @@ const actions = {
     console.log(credentials)
     axios({
       method: 'post',
-      url: 'accounts/signup/',
+      url: 'api/v1/accounts/signup/',
       data: credentials
     })
     .then((res) => {
       console.log(res)
-      // commit('SAVE_JWT', res.data)
     })
     .catch((err) => {
       console.log(err)
@@ -35,7 +34,7 @@ const actions = {
       axios({
       method: 'post',
       // url: 'api/accounts/login/',
-      url: 'accounts/api-token-auth/',
+      url: 'api/v1/accounts/login/',
       data: credentials
     })
       .then((res) => {
