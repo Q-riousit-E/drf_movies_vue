@@ -1,4 +1,5 @@
 import axios from 'axios'
+import jwt_decode from "jwt-decode";
 
 const state = {
   token: null,
@@ -50,9 +51,21 @@ const actions = {
   }
 }
 
+const getters = {
+  decodedToken(state) {
+    if (state.token) {
+      console.log('getters:', jwt_decode(state.token))
+      return jwt_decode(state.token)
+    } else {
+      return null
+    }   
+  }
+}
+
 export default {
   namespaced: true, 
   state,
   mutations,
-  actions
+  actions,
+  getters
 }

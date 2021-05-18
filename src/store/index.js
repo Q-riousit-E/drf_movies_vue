@@ -1,5 +1,7 @@
 import { createStore, createLogger } from 'vuex'
 
+import createPersistedState from "vuex-persistedstate";
+
 import auth from './modules/auth.js'
 
 export default createStore({
@@ -8,6 +10,7 @@ export default createStore({
   },
 
   plugins: [
-    createLogger()
+    createLogger(),
+    createPersistedState()
   ]
 })
