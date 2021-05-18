@@ -1,19 +1,21 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '@/views/Home.vue'
+import Articles from '@/views/Articles.vue'
+import ArticleDetail from '@/views/ArticleDetail.vue'
+
 import Signup from '@/views/Signup.vue'
 import Login from '@/views/Login.vue'
 import Logout from '@/views/Logout.vue'
 
 const routes = [
   {
-    path: '/',
-    name: 'Home',
-    component: Home
+    path: '/articles',
+    name: 'Articles',
+    component: Articles
   },
   {
-    path: '/about',
-    name: 'About',
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    path: '/articles/:id',
+    name: 'ArticleDetail',
+    component: ArticleDetail
   },
   {
     path: '/signup',

@@ -18,7 +18,7 @@ const actions = {
     console.log(credentials)
     axios({
       method: 'post',
-      url: 'api/v1/accounts/signup/',
+      url: '/api/v1/accounts/signup/',
       data: credentials
     })
     .then((res) => {
@@ -29,21 +29,20 @@ const actions = {
       })
     },
     
-    login({ commit }, credentials) {
-      console.log(credentials)
-      axios({
-      method: 'post',
-      // url: 'api/accounts/login/',
-      url: 'api/v1/accounts/login/',
-      data: credentials
+  login({ commit }, credentials) {
+    console.log(credentials)
+    axios({
+    method: 'post',
+    url: '/api/v1/accounts/login/',
+    data: credentials
+  })
+    .then((res) => {
+      console.log(res)
+      commit('SAVE_JWT', res.data)
     })
-      .then((res) => {
-        console.log(res)
-        commit('SAVE_JWT', res.data)
-      })
-      .catch((err) => {
-        console.log(err)
-      })
+    .catch((err) => {
+      console.log(err)
+    })
   },
 
   logout({ commit }) {
