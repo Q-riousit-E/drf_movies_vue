@@ -1,5 +1,5 @@
 <template>
-  <div v-if="auth_logged_in">
+  <div v-if="token">
     <button @click="onClickLogout">Logout</button>
   </div>
   <div v-else>
@@ -8,12 +8,8 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 import { computed } from 'vue'
 import { useStore } from 'vuex'
-import { useCookies } from '@vueuse/integrations'
-import { useState } from '@/helpers.js'
 
 export default {
   name: 'Logout',
@@ -22,33 +18,33 @@ export default {
     // Vuex: Check if user is logged in
     const store = useStore()
     // const { logged_in } = useState(['logged_in'])
-    const auth_logged_in = computed(() => store.state.auth.logged_in)
+    const token = computed(() => store.state.auth.token)
 
 
-    // Logout
-    const cookies = useCookies(['locale'])
-    const csrftoken = cookies.get('csrftoken')
+    // // Logout
+    // const cookies = useCookies(['locale'])
+    // const csrftoken = cookies.get('csrftoken')
 
     const onClickLogout = () => {
-      axios({
-        method: 'post',
-        url: 'api/accounts/logout/',
-        data: {csrftoken},
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-        .then((res) => {
-          // console.log(res)
+    //   axios({
+    //     method: 'post',
+    //     url: 'api/accounts/logout/',
+    //     data: {csrftoken},
+    //     headers: {
+    //       'Content-Type': 'application/json'
+    //     }
+    //   })
+    //     .then((res) => {
+    //       // console.log(res)
           store.dispatch('auth/logout')
-        })
-        .catch((err) => {
-          console.log(err)
-        })
+    //     })
+    //     .catch((err) => {
+    //       console.log(err)
+    //     })
     }
 
     return {
-      auth_logged_in,
+      token,
       onClickLogout
     }
   }

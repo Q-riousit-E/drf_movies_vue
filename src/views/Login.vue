@@ -1,18 +1,17 @@
 <template>
-  <div v-if="auth_logged_in">
+  <div v-if="token">
     <h1>User is already logged in</h1>
   </div>
   <div v-else class="wrapper fadeInDown" >
     <div id="formContent">
       <!-- Tabs Titles -->
       <h2 class="active"> Sign In </h2>
-      <h2 class="inactive underlineHover">Sign Up </h2>
 
       <!-- Login Form -->
-      <form>
-        <input type="text" id="login" class="fadeIn second" name="login" placeholder="login" v-model="email">
-        <input type="password" id="password" class="fadeIn third" name="password" placeholder="password" v-model="password" @keyup.enter="submitLogin">
-        <input type="submit" class="fadeIn fourth" value="Log In" @click="submitLogin">
+      <form @submit="submitLogin">
+        <input type="text" id="login" class="fadeIn second" name="login" placeholder="login" v-model="credentials.username">
+        <input type="password" id="password" class="fadeIn third" name="password" placeholder="password" v-model="credentials.password" @keyup.enter="submitLogin">
+        <input type="submit" class="fadeIn fourth" value="Log In">
       </form>
 
       <!-- Remind Passowrd -->
@@ -25,12 +24,8 @@
 </template>
 
 <script>
-import axios from 'axios'
-import Cookies from 'universal-cookie'
-
 import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
-import { useState } from '@/helpers.js'
 
 export default {
   name: 'Login',
@@ -38,44 +33,22 @@ export default {
   setup() {
     // Vuex: Check if user is logged in
     const store = useStore()
-    // const { logged_in } = useState(['logged_in'])
-    const auth_logged_in = computed(() => store.state.auth.logged_in)
-    console.log(auth_logged_in)
+    const token = computed(() => store.state.auth.token)
 
     // Login
-    const email = ref('admin@gmail.com')
-    const password = ref('asdfasdfqwer')
-    const cookies = new Cookies()
-    const csrftoken = cookies.get('csrftoken')
+    const credentials = ref({
+      username: 'admin',
+      password: 'asdfasdfqwer',
+    })
     
     const submitLogin = async (e) => {
       e.preventDefault()
-
-      axios({
-        method: 'post',
-        url: 'api/accounts/login/',
-        data: {
-          username: email.value,
-          password: password.value,
-          csrftoken
-        },
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-        .then((res) => {
-          // console.log(res)
-          store.dispatch('auth/login')
-        })
-        .catch((err) => {
-          console.log(err)
-        })
+      store.dispatch('auth/login', credentials.value)
     }
 
-
     return {
-      auth_logged_in,
-      email, password, submitLogin
+      token,
+      credentials, submitLogin
     }
   }
 }

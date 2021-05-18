@@ -1,23 +1,54 @@
+import axios from 'axios'
+
 const state = {
-  logged_in: false
+  token: null,
 }
 
 const mutations = {
-  SET_STATUS_TO_LOGGED_IN(state) {
-    state.logged_in = true
+  SAVE_JWT(state, token) {
+    state.token = token
   },
-  SET_STATUS_TO_LOGGED_OUT(state) {
-    state.logged_in = false
+  DELETE_JWT(state) {
+    state.token = null
   }
 }
 
 const actions = {
-  login({ commit }) {
-    commit('SET_STATUS_TO_LOGGED_IN')
+  signup({ commit }, credentials) {
+    console.log(credentials)
+    axios({
+      method: 'post',
+      url: 'accounts/signup/',
+      data: credentials
+    })
+    .then((res) => {
+      console.log(res)
+      // commit('SAVE_JWT', res.data)
+    })
+    .catch((err) => {
+      console.log(err)
+      })
+    },
+    
+    login({ commit }, credentials) {
+      console.log(credentials)
+      axios({
+      method: 'post',
+      // url: 'api/accounts/login/',
+      url: 'accounts/api-token-auth/',
+      data: credentials
+    })
+      .then((res) => {
+        console.log(res)
+        commit('SAVE_JWT', res.data)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
   },
 
   logout({ commit }) {
-    commit('SET_STATUS_TO_LOGGED_OUT')
+    commit('DELETE_JWT')
   }
 }
 
