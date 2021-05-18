@@ -1,9 +1,15 @@
 <template>
   <h1>{{ article.title }}</h1>
   <p>{{ article.content }}</p>
-  {{ article.comment_set }}
+  <div v-for="comment in article.comment_set" :key="comment.id">
+    <div>
+      <span>{{ comment }}</span>
+      <button @click="onDeleteComment(comment.id)">Delete Comment</button>
+    </div>
+  </div>
 
   <hr>
+
   <form action="#" @submit="onSubmitCommentCreate">
     <input type="text" v-model="comment">
     <input type="submit" value="Add Comment">
@@ -24,8 +30,10 @@
 
 <script>
 import axios from 'axios'
+import jwt_decode from "jwt-decode";
 
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useStore } from 'vuex'
 import { useRoute, useRouter } from 'vue-router'
 
 export default {
@@ -34,6 +42,7 @@ export default {
     // Get article info
     const route = useRoute()
     const router = useRouter()
+
 
     console.log(route.params)
 
@@ -87,11 +96,40 @@ export default {
         })
     }
 
+    // Create Comment
+    const comment = ref('')
+    const store = useStore()
+    const token = computed(() => store.state.auth.token)
+    const decodedToken = jwt_decode(token.value.token)
+
+    const onSubmitCommentCreate = () => {
+      axios({
+        method: 'post',
+        url: `/api/v1/articles/${route.params.id}/comments/`,
+        data: {
+          content: comment.value,
+          user_id: decodedToken.user_id
+        }
+      })
+        .then((res) => {
+          console.log(res)
+          article.value = res.data
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    }
+
+    const onDeleteComment = (id) => {
+      console.log(id)
+    }
+
 
     return {
       article, getArticle,
       onDeleteArticle,
-      updateData, onSubmitArticleUpdate
+      updateData, onSubmitArticleUpdate,
+      comment, onSubmitCommentCreate, onDeleteComment
     }
   },
   created() {
