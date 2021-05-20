@@ -120,10 +120,10 @@ export default {
         })
     }
 
+    // Delete Comment
     const onDeleteComment = (id) => {
       console.log(id)
     }
-
 
     return {
       article, getArticle,

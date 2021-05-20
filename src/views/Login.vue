@@ -83,7 +83,6 @@ h2 {
 
 
 /* STRUCTURE */
-
 .wrapper {
   display: flex;
   align-items: center;

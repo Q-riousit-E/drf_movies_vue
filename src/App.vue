@@ -1,5 +1,6 @@
 <template>
   <div id="nav">
+    <router-link :to="{ name: 'Home' }">Home</router-link> |
     <router-link :to="{ name: 'Articles' }">Articles</router-link> |
     <router-link :to="{ name: 'Signup' }">Signup</router-link> |
     <router-link :to="{ name: 'Login' }">Login</router-link> | 
@@ -9,6 +10,10 @@
 </template>
 
 <style>
+body {
+  background: rgb(255, 255, 255);
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -19,11 +24,13 @@
 
 #nav {
   padding: 30px;
+  position: relative;
+  z-index: 3;
 }
 
 #nav a {
   font-weight: bold;
-  color: #2c3e50;
+  color: rgb(204, 204, 204);
 }
 
 #nav a.router-link-exact-active {
