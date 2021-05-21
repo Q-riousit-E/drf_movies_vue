@@ -34,6 +34,6 @@ nav {
   display: block;
   top: 20%;
   right: 15px;
-  z-index: 3;
+  z-index: -1;
 }
 </style>

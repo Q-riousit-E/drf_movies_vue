@@ -1,5 +1,5 @@
 <template>
-  <!-- <canvas id="c" v-show="!loadingThree" :class="{ invisible: loadingThree }"></canvas> -->
+  <!-- <canvas id="c"></canvas> -->
   <canvas id="c" :class="{ invisible: loadingThree, showAnimation: !loadingThree }"></canvas>
   <div class="wrap" v-if="loadingThree">
     <div class="bg">
@@ -93,7 +93,7 @@ export default {
   width: 100%;
   left: 0;
   top: 0;
-  z-index: 2;
+  z-index: 0;
 }
 
 #c.invisible {

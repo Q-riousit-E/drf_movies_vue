@@ -7,6 +7,7 @@ import { NodePass } from 'three/examples/jsm/nodes/postprocessing/NodePass.js'
 import * as Nodes from 'three/examples/jsm/nodes/Nodes.js'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js'
+import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
 
 import gsap from 'gsap'
 
@@ -29,6 +30,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   const scene = new THREE.Scene()
   const loadManager = new THREE.LoadingManager()
   const loader = new THREE.TextureLoader(loadManager)
+  const gui = new GUI()
   const gsapDuration = 1
   // scene.background = new THREE.Color('gray')
   
@@ -70,21 +72,35 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   const frame = new Nodes.NodeFrame()
 
   // 2. Romance 
-  // const params = {
-  //   exposure: 1,
-  //   bloomStrength: 1.5,
-  //   bloomThreshold: 0,
-  //   bloomRadius: 0
-  // }
-  // const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
-  // bloomPass.threshold = params.bloomThreshold;
-  // bloomPass.strength = params.bloomStrength;
-  // bloomPass.radius = params.bloomRadius;
+  const params = {
+    exposure: 1,
+    bloomStrength: 0.32,
+    bloomThreshold: 0.25,
+    bloomRadius: 0
+  }
+  let romanceFlag = false
+  const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+  bloomPass.threshold = params.bloomThreshold;
+  bloomPass.strength = params.bloomStrength;
+  bloomPass.radius = params.bloomRadius;
 
-  // composer = new EffectComposer( renderer );
-  // composer.addPass( renderScene );
-  // composer.addPass( bloomPass );
+  const romanceComposer = new EffectComposer( renderer );
+  romanceComposer.addPass(new RenderPass(scene, camera));
+  romanceComposer.addPass( bloomPass );
 
+  const bloomFolder = gui.addFolder("Bloom")
+  bloomFolder.add( params, 'exposure', 0.1, 2 ).step(0.01).onChange( function ( value ) {
+    renderer.toneMappingExposure = Math.pow( value, 4.0 );
+  } );
+  bloomFolder.add( params, 'bloomThreshold', 0.0, 1.0 ).step(0.01).onChange( function ( value ) {
+    bloomPass.threshold = Number( value );
+  } );
+  bloomFolder.add( params, 'bloomStrength', 0.0, 0.5 ).step(0.01).onChange( function ( value ) {
+    bloomPass.strength = Number( value );
+  } );
+  bloomFolder.add( params, 'bloomRadius', 0.0, 1.0 ).step( 0.01 ).onChange( function ( value ) {
+    bloomPass.radius = Number( value );
+  } );
 
   // 5. Horror
   // init
@@ -227,8 +243,9 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
 
   //// 2. Romance
   const heartGroup = new THREE.Group()
-  heartGroup.position.set(20, 50-cameraScrollDist, 30)
+  heartGroup.position.set(0, -cameraScrollDist, radius * 1.6)
   const x = 0, y = 0
+  const extrudeSettings = { depth: 8, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1 };
   const heartShape = new THREE.Shape()
   .moveTo( x + 25, y + 25 )
   .bezierCurveTo( x + 25, y + 25, x + 20, y, x, y )
@@ -238,20 +255,29 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   .bezierCurveTo( x + 80, y + 35, x + 80, y, x + 50, y )
   .bezierCurveTo( x + 35, y, x + 25, y + 25, x + 25, y + 25 )
   
-  addLineShape( heartShape, 0xf00000, 0, 0, 0, 0, 0, Math.PI, 1 )
-  
-  function addLineShape( shape, color, x, y, z, rx, ry, rz, s ) {
-    // lines
-    shape.autoClose = true;
-    const spacedPoints = shape.getSpacedPoints( 70 );
-    const geometrySpacedPoints = new THREE.BufferGeometry().setFromPoints( spacedPoints );
-    
-    // equidistance sampled points
-    let particles = new THREE.Points( geometrySpacedPoints, new THREE.PointsMaterial( { color: color, size: 2 } ) );
-    particles.position.set( x, y, z + 125 );
-    particles.rotation.set( rx, ry, rz );
-    particles.scale.set( s, s, s );
-    heartGroup.add( particles );
+  for (let i=0; i<10; i++) {
+    const x = (Math.random()-0.5)*200
+    const y = (Math.random()-0.5)*100
+    const rotY = getRand(-Math.PI, Math.PI)
+    const size = getRand(0.04, 0.08)
+    addShape( heartShape, extrudeSettings, 0xf00000, x, y, 0, 0, rotY, Math.PI, size );
+  }
+
+  function addShape( shape, extrudeSettings, color, x, y, z, rx, ry, rz, s ) {
+    const geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+    const mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { color: color } ) );
+    const speedX = (Math.random() - 0.5) * 2
+    const speedY = (Math.random() - 0.5)
+    const rotSpeed = getRand(0.01, 0.03)
+
+    mesh.position.set( x, y, z );
+    mesh.rotation.set( rx, ry, rz );
+    mesh.scale.set( s, s, s );
+    mesh.speedX = speedX
+    mesh.speedY = speedY
+    mesh.rotSpeed = rotSpeed
+    heartGroup.add( mesh );
+    console.log(mesh.position)
   }
   scene.add(heartGroup)
   
@@ -268,15 +294,28 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   
   /////////////////////////////////////////////////////////////////////////////////////
   //// Lights
-  // const light0 = new THREE.PointLight( 0xffffff, 1.5 )
-  // light0.position.set(0, 0, radius*0.8)
-  // scene.add( light0 )
+  const light0 = new THREE.PointLight( 0xffffff, 2 )
+  light0.position.set(0, -2*cameraScrollDist, radius*1.4)
+  scene.add( light0 )
+  const pointLightFolder = gui.addFolder("Point Light")
+  pointLightFolder.add(light0, 'intensity', 0, 2, 0.01);
+  pointLightFolder.add(light0.position, 'x', -10, 10);
+  pointLightFolder.add(light0.position, 'z', -10, 10);
+  pointLightFolder.add(light0.position, 'y', 0, 10);
 
-  const light1 = new THREE.DirectionalLight( 'rgb(245, 246, 250)', 1 )
+  const light1 = new THREE.DirectionalLight( 'rgb(245, 246, 250)', 0.7 )
   light1.position.set(0, 10, 0)
   light1.target.position.set(0, 0, radius)
   scene.add( light1 )
   scene.add(light1.target)
+  const directionalLightFolder = gui.addFolder("Directional Light")
+  directionalLightFolder.add(light1, 'intensity', 0, 2, 0.01);
+  directionalLightFolder.add(light1.position, 'x', -10, 10);
+  directionalLightFolder.add(light1.position, 'z', -10, 10);
+  directionalLightFolder.add(light1.position, 'y', -10, 10);
+  directionalLightFolder.add(light1.target.position, 'x', -10, 10);
+  directionalLightFolder.add(light1.target.position, 'z', -10, 10);
+  directionalLightFolder.add(light1.target.position, 'y', -10, 10);
 
   // const light2 = new THREE.SpotLight('rgb(245, 246, 250)', 10)
   // light2.position.set(20, 20, 20)
@@ -291,7 +330,6 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   // scene.add(helper);
   // light2.target.updateMatrixWorld();
 
-
   //////////////////////////////////////////////////////////////////////////
   //// Events
   const mouseVector = new THREE.Vector2()
@@ -301,17 +339,12 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   
   ///////////////////////////////////////////////////////////////////////////
   //// Functions
-  // function resizeRendererToDisplaySize(renderer) {
-  //   const canvas = renderer.domElement;
-  //   const width = canvas.clientWidth;
-  //   const height = canvas.clientHeight;
-  //   const needResize = canvas.width !== width || canvas.height !== height;
-  //   if (needResize) {
-  //     renderer.setSize(width, height, false);
-  //   }
-  //   return needResize;
-  // }
+  //  Utility
+  function getRand(min, max) {
+    return Math.random() * (max - min) + min
+  }
 
+  // Event Handlers
   function onWindowResize() {
     const width = window.innerWidth;
     const height = window.innerHeight;
@@ -323,7 +356,6 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
     horrorComposer.setSize( width, height );
   }
   
-  // Mouse events
 	function onCanvasMouseDown( event ) {
     event.preventDefault()
 		mouseVector.x = event.clientX
@@ -432,6 +464,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
 
   // change background according to genre
   function changeBackground() {
+    romanceFlag = false
     horrorFlag = false
     switch (cameraScrollIdx) {
       case 0:
@@ -449,6 +482,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
         break
         case 1:
           console.log('romance')
+          romanceFlag = true
           gsap.to(currBgc, { 
             duration: 1,
             r: 255,
@@ -723,7 +757,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
       }
     })
 
-    // update particles only when camera is clone enough
+    // 1. Sci-fi update particles and amongus only when camera is clone enough
     if (camera.position.y > -1.5 * cameraScrollDist) {
       if (characterLoaded) {
         character.rotation.x += Math.random() * 0.007
@@ -762,6 +796,21 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
       }
     }
 
+    // 2. Romance
+    if (camera.position.y < 0 && camera.position.y > -2.5 * cameraScrollDist) {
+      heartGroup.children.forEach((heart) => {
+        heart.position.x += heart.speedX * 0.7
+        heart.position.y += heart.speedY * 0.7
+        heart.rotation.y += heart.rotSpeed
+        if (heart.position.x > 150 || heart.position.x < -150) {
+          heart.speedX *= -1
+        }
+        if (heart.position.y > 70 || heart.position.y < -70) {
+          heart.speedY *= -1
+        }
+      })
+    }
+
 		// mouse interaction
 		raycaster.setFromCamera( mouseVector, camera );
 
@@ -769,6 +818,8 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
     if (horrorFlag) {
       frame.update( time ).updateNode( nodePass.material );
       horrorComposer.render()
+    } else if (romanceFlag) {
+      romanceComposer.render()
     } else {
       renderer.render(scene, camera)
     }

@@ -27,7 +27,7 @@ body {
 #nav {
   padding: 30px;
   position: relative;
-  z-index: 3;
+  z-index: -1;
 }
 
 #nav a {
