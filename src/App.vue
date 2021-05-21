@@ -11,7 +11,7 @@
 
 <style>
 body {
-  background: rgb(255, 255, 255);
+  background: rgb(73, 73, 73);
 }
 
 #app {

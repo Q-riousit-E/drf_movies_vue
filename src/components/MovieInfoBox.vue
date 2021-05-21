@@ -1,6 +1,7 @@
 <template>
   <div class="movie-info-box">
     <button class="close" @click="onResetPickImage">X</button>
+    <p>Movie id: {{ picked_movie_id }}</p>
     <p>Movie title</p>
     <p>Movie ratings</p>
     <a href="#">Movie Details</a>
@@ -8,15 +9,28 @@
 </template>
 
 <script>
+import { computed } from 'vue'
+import { useStore } from 'vuex'
+
 export default {
   name: 'MovieInfoBox',
+  props: {
+    picked_movie_id: Number
+  },
   setup(props, { emit }) {
+    // Vuex
+    const store = useStore()
+    const moviesObj = computed(() => store.state.movies.moviesObj)
+    const picked_movie_id = computed(() => store.state.movies.picked_movie_id)
+
+    // Vue comm
     const onResetPickImage = () => {
       emit('onResetPickImage')
     }
 
     return {
-      onResetPickImage
+      onResetPickImage,
+      moviesObj, picked_movie_id
     }
   }
 }

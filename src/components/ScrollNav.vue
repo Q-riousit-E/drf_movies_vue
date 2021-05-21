@@ -1,12 +1,12 @@
 <template>
   <nav>
     <ul>
-      <li><button @click="onClickNavMenu('Sci-fi')">Sci-fi</button></li>
-      <li><button @click="onClickNavMenu('Romance')">Romance</button></li>
-      <li><button @click="onClickNavMenu('Animation')">Animation</button></li>
-      <li><button @click="onClickNavMenu('Comedy')">Comedy</button></li>
-      <li><button @click="onClickNavMenu('Action')">Action</button></li>
-      <li><button @click="onClickNavMenu('Horror')">Horror</button></li>
+      <li><button @click="onClickNavMenu('sci_fi')">Sci-fi</button></li>
+      <li><button @click="onClickNavMenu('romance')">Romance</button></li>
+      <li><button @click="onClickNavMenu('animation')">Animation</button></li>
+      <li><button @click="onClickNavMenu('comedy')">Comedy</button></li>
+      <li><button @click="onClickNavMenu('action')">Action</button></li>
+      <li><button @click="onClickNavMenu('horror')">Horror</button></li>
     </ul>
   </nav>
 </template>

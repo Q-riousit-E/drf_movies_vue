@@ -1,4 +1,11 @@
 import * as THREE from 'three'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass.js';
+import { NodePass } from 'three/examples/jsm/nodes/postprocessing/NodePass.js';
+import * as Nodes from 'three/examples/jsm/nodes/Nodes.js'
+
 import gsap from 'gsap'
 
 // data to be received from vue
@@ -9,44 +16,22 @@ function start(data) {
   vueData.push(...data)
 }
 
-function main(isVisible) {
-  // // test
-  // console.log(vueData)
+function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
+  // test
+  console.log(movieObjs)
 
   ////////////////////////////////////////////////////////////////////////
-  //// data
-  const movieData = {
-    'Sci-fi': {
-      idx: 0,
-      urls: ['https://image.tmdb.org/t/p/w500//pgqgaUx1cJb5oZQQ5v0tNARCeBp.jpg', 'https://image.tmdb.org/t/p/w500//tnAuB8q5vv7Ax9UAEje5Xi4BXik.jpg', 'https://image.tmdb.org/t/p/w500//9kg73Mg8WJKlB9Y2SAJzeDKAnuB.jpg', 'https://image.tmdb.org/t/p/w500//u74DFoZGTcZ8cuHO8nvQkCqXEVP.jpg', 'https://image.tmdb.org/t/p/w500//e4REOC6CZW8J6FslA4nRvdQXFXR.jpg', 'https://image.tmdb.org/t/p/w500//6XYLiMxHAaCsoyrVo38LBWMw2p8.jpg', 'https://image.tmdb.org/t/p/w500//p9YDHJKvUoi7v2SCd3vLGPae1Xp.jpg', 'https://image.tmdb.org/t/p/w500//2W4ZvACURDyhiNnSIaFPHfNbny3.jpg', 'https://image.tmdb.org/t/p/w500//2uNW4WbgBXL25BAbXGLnLqX71Sw.jpg', 'https://image.tmdb.org/t/p/w500//eLT8Cu357VOwBVTitkmlDEg32Fs.jpg', 'https://image.tmdb.org/t/p/w500//hGPGRRz6FTIRed1zestdWrV2Iwd.jpg', 'https://image.tmdb.org/t/p/w500//13B6onhL6FzSN2KaNeQeMML05pS.jpg', 'https://image.tmdb.org/t/p/w500//tmghT8HaddVIS9hEXIOI9GuDchi.jpg', 'https://image.tmdb.org/t/p/w500//7WsyChQLEftFiDOVTGkv3hFpyyt.jpg', 'https://image.tmdb.org/t/p/w500//jDwZavHo99JtGsCyRzp4epeeBHx.jpg', 'https://image.tmdb.org/t/p/w500//8WUVHemHFH2ZIP6NWkwlHWsyrEL.jpg', 'https://image.tmdb.org/t/p/w500//2xnf2ZaGXudvgBKPtVXMkNeooh1.jpg', 'https://image.tmdb.org/t/p/w500//k68nPLbIST6NP96JmTxmZijEvCA.jpg', 'https://image.tmdb.org/t/p/w500//or06FN3Dka5tukK1e9sl16pB3iy.jpg', 'https://image.tmdb.org/t/p/w500//4q2hz2m8hubgvijz8Ez0T2Os2Yv.jpg']
-    },
-    Romance: {
-      idx: 1,
-      urls: ['https://image.tmdb.org/t/p/w500//3btDwus5VN5jOWfA9strpDJWwfj.jpg', 'https://image.tmdb.org/t/p/w500//kiX7UYfOpYrMFSAGbI6j1pFkLzQ.jpg', 'https://image.tmdb.org/t/p/w500//bAQ8O5Uw6FedtlCbJTutenzPVKd.jpg', 'https://image.tmdb.org/t/p/w500//gn2vCmWO7jQBBto9SYuBHYZARaU.jpg', 'https://image.tmdb.org/t/p/w500//c7JzcVK4OZY1u7HYiFBOASkKPP5.jpg', 'https://image.tmdb.org/t/p/w500//xKCtoYHUyX8zAg68eemnYa2orep.jpg', 'https://image.tmdb.org/t/p/w500//umy454n46930E9ak437kxT7kcXU.jpg', 'https://image.tmdb.org/t/p/w500//u3B2YKUjWABcxXZ6Nm9h10hLUbh.jpg', 'https://image.tmdb.org/t/p/w500//7Ai8vNEv4zEveh12JViGikoVPVV.jpg', 'https://image.tmdb.org/t/p/w500//MBiKqTsouYqAACLYNDadsjhhC0.jpg', 'https://image.tmdb.org/t/p/w500//m48l3LFjwJ1UQqUdX37t09B38vy.jpg', 'https://image.tmdb.org/t/p/w500//7EuZIYEHLTu1G69maFLwg13u5iB.jpg', 'https://image.tmdb.org/t/p/w500//qgrk7r1fV4IjuoeiGS5HOhXNdLJ.jpg', 'https://image.tmdb.org/t/p/w500//63kGofUkt1Mx0SIL4XI4Z5AoSgt.jpg', 'https://image.tmdb.org/t/p/w500//9ZedQHPQVveaIYmDSTazhT3y273.jpg', 'https://image.tmdb.org/t/p/w500//j9O2WXJqF45ynkng4SAsZ1h0OCt.jpg', 'https://image.tmdb.org/t/p/w500//q719jXXEzOoYaps6babgKnONONX.jpg', 'https://image.tmdb.org/t/p/w500//hPBJckYsL1UOsz44InZ2wYJyJTy.jpg', 'https://image.tmdb.org/t/p/w500//tuFaWiqX0TXoWu7DGNcmX3UW7sT.jpg', 'https://image.tmdb.org/t/p/w500//vg9C5LttsKBqoLuqeQvOXaeBGiD.jpg']
-    },
-    Animation: {
-      idx: 2,
-      urls: ['https://image.tmdb.org/t/p/w500//xCEg6KowNISWvMh8GvPSxtdf9TO.jpg', 'https://image.tmdb.org/t/p/w500//95S6PinQIvVe4uJAd82a2iGZ0rA.jpg', 'https://image.tmdb.org/t/p/w500//wcrjc1uwQaqoqtqi67Su4VCOYo0.jpg', 'https://image.tmdb.org/t/p/w500//iqO2sTFqm6XwEXmlLxKDX75RPjY.jpg', 'https://image.tmdb.org/t/p/w500//tmghT8HaddVIS9hEXIOI9GuDchi.jpg', 'https://image.tmdb.org/t/p/w500//lcyKve7nXRFgRyms9M1bndNkKOx.jpg', 'https://image.tmdb.org/t/p/w500//8jDvtdH327I8TgX3UPdkAsZF1dA.jpg', 'https://image.tmdb.org/t/p/w500//sCoG0ibohbPrnyomtzegSuBL40L.jpg', 'https://image.tmdb.org/t/p/w500//m6bUeV4mczG3z2YXXr5XDKPsQzv.jpg', 'https://image.tmdb.org/t/p/w500//h7dZpJDORYs5c56dydbrLFkEXpE.jpg', 'https://image.tmdb.org/t/p/w500//7EGElXVSNnqcPjuhXPd6UVUX1rD.jpg', 'https://image.tmdb.org/t/p/w500//zEqyD0SBt6HL7W9JQoWwtd5Do1T.jpg', 'https://image.tmdb.org/t/p/w500//ode14q7WtDugFDp78fo9lCsmay9.jpg', 'https://image.tmdb.org/t/p/w500//kxc25B05Gq4CbCoWbyTFf9iF0wn.jpg', 'https://image.tmdb.org/t/p/w500//8F9xUvb1JMWUMkFV2Yq3aiueAbq.jpg', 'https://image.tmdb.org/t/p/w500//suORidtGKPO6tWwNqiwGvNo85z3.jpg', 'https://image.tmdb.org/t/p/w500//s836PRwHkLjrOJrfW0eo7B4NJOf.jpg', 'https://image.tmdb.org/t/p/w500//4WT7zYFpe0fsbg6TitppiHddWAh.jpg', 'https://image.tmdb.org/t/p/w500//2LwamrHAmxqEHsT9JViFJxT08Ek.jpg', 'https://image.tmdb.org/t/p/w500//5aL71e0XBgHZ6zdWcWeuEhwD2Gw.jpg']
-    },
-    Comedy: {
-      idx: 3,
-      urls: ['https://image.tmdb.org/t/p/w500//oBgWY00bEFeZ9N25wWVyuQddbAo.jpg', 'https://image.tmdb.org/t/p/w500//32vLDKSzcCMh55zqqaSqqUA8naz.jpg', 'https://image.tmdb.org/t/p/w500//dkokENeY5Ka30BFgWAqk14mbnGs.jpg', 'https://image.tmdb.org/t/p/w500//msI5a9TPnepx47JUb2vl88hb80R.jpg', 'https://image.tmdb.org/t/p/w500//3mKMWP5OokB7QpcOMA1yl8BXFAF.jpg', 'https://image.tmdb.org/t/p/w500//keEnkeAvifw8NSEC4f6WsqeLJgF.jpg', 'https://image.tmdb.org/t/p/w500//8XZI9QZ7Pm3fVkigWJPbrXCMzjq.jpg', 'https://image.tmdb.org/t/p/w500//3RE9DNBCvuso5OPZPg71ryntNjx.jpg', 'https://image.tmdb.org/t/p/w500//hm58Jw4Lw8OIeECIq5qyPYhAeRJ.jpg', 'https://image.tmdb.org/t/p/w500//tbVZ3Sq88dZaCANlUcewQuHQOaE.jpg', 'https://image.tmdb.org/t/p/w500//19kfvGktytDZInUmpv3WlaHoTxP.jpg', 'https://image.tmdb.org/t/p/w500//A1Gy5HX3DKGaNW1Ay30NTIVJqJ6.jpg', 'https://image.tmdb.org/t/p/w500//qRyy2UmjC5ur9bDi3kpNNRCc5nc.jpg', 'https://image.tmdb.org/t/p/w500//3btDwus5VN5jOWfA9strpDJWwfj.jpg', 'https://image.tmdb.org/t/p/w500//gd9PcIgzV3YWa0c7iCECG1TuXX5.jpg', 'https://image.tmdb.org/t/p/w500//b1C0FuXp4wiPmHLVKq4kwtDMgK6.jpg', 'https://image.tmdb.org/t/p/w500//pMyCYtgfBmMisX3RFc5eH6zIV5Y.jpg', 'https://image.tmdb.org/t/p/w500//jlJ8nDhMhCYJuzOw3f52CP1W8MW.jpg', 'https://image.tmdb.org/t/p/w500//2xnf2ZaGXudvgBKPtVXMkNeooh1.jpg', 'https://image.tmdb.org/t/p/w500//aSGwXbaTMxUhrfXT6xyZKqoklfB.jpg']
-    },
-    Action: {
-      idx: 4,
-      urls: ['https://image.tmdb.org/t/p/w500//rEm96ib0sPiZBADNKBHKBv5bve9.jpg', 'https://image.tmdb.org/t/p/w500//nkayOAUBUu4mMvyNf9iHSUiPjF1.jpg', 'https://image.tmdb.org/t/p/w500//pgqgaUx1cJb5oZQQ5v0tNARCeBp.jpg', 'https://image.tmdb.org/t/p/w500//oBgWY00bEFeZ9N25wWVyuQddbAo.jpg', 'https://image.tmdb.org/t/p/w500//tnAuB8q5vv7Ax9UAEje5Xi4BXik.jpg', 'https://image.tmdb.org/t/p/w500//h8Rb9gBr48ODIwYUttZNYeMWeUU.jpg', 'https://image.tmdb.org/t/p/w500//AoWY1gkcNzabh229Icboa1Ff0BM.jpg', 'https://image.tmdb.org/t/p/w500//lPsD10PP4rgUGiGR4CCXA6iY0QQ.jpg', 'https://image.tmdb.org/t/p/w500//3mKMWP5OokB7QpcOMA1yl8BXFAF.jpg', 'https://image.tmdb.org/t/p/w500//keEnkeAvifw8NSEC4f6WsqeLJgF.jpg', 'https://image.tmdb.org/t/p/w500//6vcDalR50RWa309vBH1NLmG2rjQ.jpg', 'https://image.tmdb.org/t/p/w500//9kg73Mg8WJKlB9Y2SAJzeDKAnuB.jpg', 'https://image.tmdb.org/t/p/w500//1UCOF11QCw8kcqvce8LKOO6pimh.jpg', 'https://image.tmdb.org/t/p/w500//8UlWHLMpgZm9bx6QYh0NFoq67TZ.jpg', 'https://image.tmdb.org/t/p/w500//xCEg6KowNISWvMh8GvPSxtdf9TO.jpg', 'https://image.tmdb.org/t/p/w500//zoeKREZ2IdAUnXISYCS0E6H5BVh.jpg', 'https://image.tmdb.org/t/p/w500//6XYLiMxHAaCsoyrVo38LBWMw2p8.jpg', 'https://image.tmdb.org/t/p/w500//AmUGn1rJ9XDDP6DYn9OA2uV8MIg.jpg', 'https://image.tmdb.org/t/p/w500//dWSnsAGTfc8U27bWsy2RfwZs0Bs.jpg', 'https://image.tmdb.org/t/p/w500//6goDkAD6J3br81YMQf0Gat8Bqjy.jpg']
-    },
-    Horror: {
-      idx: 5,
-      urls: ['https://image.tmdb.org/t/p/w500//b4gYVcl8pParX8AjkN90iQrWrWO.jpg', 'https://image.tmdb.org/t/p/w500//keEnkeAvifw8NSEC4f6WsqeLJgF.jpg', 'https://image.tmdb.org/t/p/w500//3RE9DNBCvuso5OPZPg71ryntNjx.jpg', 'https://image.tmdb.org/t/p/w500//95S6PinQIvVe4uJAd82a2iGZ0rA.jpg', 'https://image.tmdb.org/t/p/w500//xXI5Lg6mJLEesTggRJBrq50vrqU.jpg', 'https://image.tmdb.org/t/p/w500//iqO2sTFqm6XwEXmlLxKDX75RPjY.jpg', 'https://image.tmdb.org/t/p/w500//4U1SBHmwHkNA0eHZ2n1CuiC1K1g.jpg', 'https://image.tmdb.org/t/p/w500//hGPGRRz6FTIRed1zestdWrV2Iwd.jpg', 'https://image.tmdb.org/t/p/w500//xZ2KER2gOHbuHP2GJoODuXDSZCb.jpg', 'https://image.tmdb.org/t/p/w500//tmghT8HaddVIS9hEXIOI9GuDchi.jpg', 'https://image.tmdb.org/t/p/w500//b1C0FuXp4wiPmHLVKq4kwtDMgK6.jpg', 'https://image.tmdb.org/t/p/w500//xD9mc8JCVXA8T8u4Od7qOUBuGH4.jpg', 'https://image.tmdb.org/t/p/w500//9umVH1R5Z2I1Fqzg7qwMIR2gpKG.jpg', 'https://image.tmdb.org/t/p/w500//lcyKve7nXRFgRyms9M1bndNkKOx.jpg', 'https://image.tmdb.org/t/p/w500//wB8qqLIaYDkYEnjbS5hAJiTuYU6.jpg', 'https://image.tmdb.org/t/p/w500//kBKKXVbVwIP81u8Bnhguux48Sdn.jpg', 'https://image.tmdb.org/t/p/w500//7S9RvfMBWSTlUZ4VbxDY7oLeenk.jpg', 'https://image.tmdb.org/t/p/w500//wDmulF9Psmp00huLaLcqqjRHFdp.jpg', 'https://image.tmdb.org/t/p/w500//b2shaNA4F8zNIwoRYr33lPTiFfl.jpg', 'https://image.tmdb.org/t/p/w500//h7dZpJDORYs5c56dydbrLFkEXpE.jpg']
-    },
-  }
+  //// Communication with Vue
+  // html querying
+  const loadingElem = document.querySelector('#loading')
+  const progressBarElem = loadingElem.querySelector('.progressbar')
 
   ////////////////////////////////////////////////////////////////////////
   //// Setup
   const canvas = document.querySelector('#c')
   const scene = new THREE.Scene()
-  const loader = new THREE.TextureLoader
+  const loadManager = new THREE.LoadingManager()
+  const loader = new THREE.TextureLoader(loadManager)
   const gsapDuration = 1
   // scene.background = new THREE.Color('gray')
   
@@ -69,10 +54,58 @@ function main(isVisible) {
   // Renderer
   const renderer = new THREE.WebGLRenderer({ 
     canvas,
-    alpha: true
+    alpha: true,
   })
   let currBgc = {r: 30, g: 40, b: 42, opacity: 1}
   renderer.setClearColor(new THREE.Color(`rgb(${currBgc.r}, ${currBgc.g}, ${currBgc.b})`), currBgc.opacity)
+  renderer.setPixelRatio(window.devicePixelRatio)
+  renderer.setSize(canvas.clientWidth, canvas.clientHeight)
+  renderer.shadowMap.enabled = true
+  // renderer.toneMapping = THREE.ReinhardToneMapping
+
+  //// PostProcessing
+  const frame = new Nodes.NodeFrame()
+
+  // 2. Romance 
+  // const params = {
+  //   exposure: 1,
+  //   bloomStrength: 1.5,
+  //   bloomThreshold: 0,
+  //   bloomRadius: 0
+  // }
+  // const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+  // bloomPass.threshold = params.bloomThreshold;
+  // bloomPass.strength = params.bloomStrength;
+  // bloomPass.radius = params.bloomRadius;
+
+  // composer = new EffectComposer( renderer );
+  // composer.addPass( renderScene );
+  // composer.addPass( bloomPass );
+
+
+  // 5. Horror
+  // init
+  let horrorFlag = false
+  const horrorComposer = new EffectComposer(renderer)
+  const nodePass = new NodePass()
+  horrorComposer.addPass(new RenderPass(scene, camera))
+  horrorComposer.addPass(nodePass)
+
+  // blur
+  const size = renderer.getDrawingBufferSize( new THREE.Vector2() )
+  const blurScreen = new Nodes.BlurNode( new Nodes.ScreenNode() )
+  const blurVal = 1.5
+  blurScreen.size = new THREE.Vector2( size.width, size.height )
+  blurScreen.radius.x = blurVal
+  blurScreen.radius.y = blurVal
+  
+  nodePass.input = blurScreen;
+  nodePass.needsUpdate = true;
+
+  // glitch
+  const glitchPass = new GlitchPass()
+  horrorComposer.setSize(canvas.clientWidth, canvas.clientHeight)
+  horrorComposer.addPass(glitchPass)
 
   //////////////////////////////////////////////////////////////////////
   //// Objects
@@ -84,37 +117,49 @@ function main(isVisible) {
   const movieEnlargeScale = {value: 1, goal: 0.3}
   const pickedRadius = 61
   const pickedAngle = -0.075  // this has to depend on screen size
+  const movieGenreIdx = {
+    'sci_fi': 0,
+    'romance': 1,
+    'animation': 2,
+    'comedy': 3,
+    'action': 4,
+    'horror': 5
+  }
   let movieRotation = true
   let moviesFaceCam = true
   let pickedMovieFaceCam = false
   let formerMovieRotation
   
   const movies = []
-  for (let genre in movieData) {
-    movieData[genre]['urls'].forEach((url, idx) => {
-      makeInstance(geometry, genre, url, idx)
+  for (let genre in movieObjs) {
+    console.log(genre)
+    movieObjs[genre].forEach((movieObj, idx) => {
+      makeInstance(geometry, genre, movieObj, idx)
     })
   }
-  
-  function makeInstance(geometry, genre, url, idx) {
-    const material = new THREE.MeshBasicMaterial({map: loader.load(url)})
+ 
+  function makeInstance(geometry, genre, movieObj, idx) {
+    const material = new THREE.MeshBasicMaterial({map: loader.load(movieObj.poster_path.replace('/original/', '/w500/'))})
     
     const movie = new THREE.Mesh(geometry, material);
     scene.add(movie);
     
-    const numMovies = movieData[genre]['urls'].length
+    const numMovies = movieObjs[genre].length
 		const rad = idx * (2*Math.PI / numMovies)
     const x = radius * Math.cos(rad)
-    const y = -movieData[genre]['idx'] * cameraScrollDist
+    const y = -movieGenreIdx[genre] * cameraScrollDist
     const z = radius * Math.sin(rad)
     movie.position.set(x, y, z);
     movie.lookAt(cameraStartingPos.x, cameraStartingPos.y, cameraStartingPos.z)
 		movie.rad = rad
+    movie.movie_id = movieObj.id
     
     movies.push(movie)
   }
   main.makeInstance = makeInstance
   
+  /////////////////////////////////////////////////////////////////////////////
+  //// 1. Sci-fi
   // Particles
   const particlesGeometry = new THREE.BufferGeometry
   const starsGeometry = new THREE.BufferGeometry
@@ -149,14 +194,55 @@ function main(isVisible) {
   scene.add(particlesMesh)
   
   // Stars
-  const starLoader = new THREE.TextureLoader()
-  const star = starLoader.load('./star4.png')
+  const star = loader.load('./star4.png')
   const starMaterial = new THREE.PointsMaterial({ size: 3, map: star, transparent: true })
   starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(posiitionsStars, 3))
-  const starsMesh = new THREE.Points(starsGeometry, starMaterial)
+  const starsMesh = new THREE.Points(starsGeometry, starMaterial)  
   scene.add(starsMesh)
 
-  // // Lights
+  //// 2. Romance
+  const heartGroup = new THREE.Group()
+  heartGroup.position.set(20, 10-cameraScrollDist, 50)
+  const x = 0, y = 0
+  const heartShape = new THREE.Shape()
+  .moveTo( x + 25, y + 25 )
+  .bezierCurveTo( x + 25, y + 25, x + 20, y, x, y )
+  .bezierCurveTo( x - 30, y, x - 30, y + 35, x - 30, y + 35 )
+  .bezierCurveTo( x - 30, y + 55, x - 10, y + 77, x + 25, y + 95 )
+  .bezierCurveTo( x + 60, y + 77, x + 80, y + 55, x + 80, y + 35 )
+  .bezierCurveTo( x + 80, y + 35, x + 80, y, x + 50, y )
+  .bezierCurveTo( x + 35, y, x + 25, y + 25, x + 25, y + 25 )
+  
+  addLineShape( heartShape, 0xf00000, 0, 0, 0, 0, 0, Math.PI, 1 )
+  
+  function addLineShape( shape, color, x, y, z, rx, ry, rz, s ) {
+    // lines
+    shape.autoClose = true;
+    const spacedPoints = shape.getSpacedPoints( 70 );
+    const geometrySpacedPoints = new THREE.BufferGeometry().setFromPoints( spacedPoints );
+    
+    // equidistance sampled points
+    let particles = new THREE.Points( geometrySpacedPoints, new THREE.PointsMaterial( { color: color, size: 2 } ) );
+    particles.position.set( x, y, z + 125 );
+    particles.rotation.set( rx, ry, rz );
+    particles.scale.set( s, s, s );
+    heartGroup.add( particles );
+  }
+  scene.add(heartGroup)
+  
+  /////////////////////////////////////////////////////////////////////////////////////
+  //// Loading
+  loadManager.onProgress = (urlOfLastItemLoaded, itemsLoaded, itemsTotal) => {
+    const progress = itemsLoaded / itemsTotal
+    progressBarElem.style.transform = `scaleX(${progress})`
+  }
+
+  loadManager.onLoad = () => {
+    loadingThree.value = false
+  }
+  
+  /////////////////////////////////////////////////////////////////////////////////////
+  //// Lights
   // const lightTarget = new THREE.Object3D()
   // lightTarget.position.set(0, 0, 5)
   // scene.add(lightTarget)
@@ -169,7 +255,10 @@ function main(isVisible) {
   // const light2 = new THREE.DirectionalLight(color, intensity)
   // light2.position.set(0, 2, -5)
   // scene.add(light2)
-  
+
+  // const light3 = new THREE.PointLight( 0xffffff, 0.8 )
+  // camera.add( light3 )
+
   //////////////////////////////////////////////////////////////////////////
   //// Events
   const mouseVector = new THREE.Vector2()
@@ -179,15 +268,26 @@ function main(isVisible) {
   
   ///////////////////////////////////////////////////////////////////////////
   //// Functions
-  function resizeRendererToDisplaySize(renderer) {
-    const canvas = renderer.domElement;
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-    const needResize = canvas.width !== width || canvas.height !== height;
-    if (needResize) {
-      renderer.setSize(width, height, false);
-    }
-    return needResize;
+  // function resizeRendererToDisplaySize(renderer) {
+  //   const canvas = renderer.domElement;
+  //   const width = canvas.clientWidth;
+  //   const height = canvas.clientHeight;
+  //   const needResize = canvas.width !== width || canvas.height !== height;
+  //   if (needResize) {
+  //     renderer.setSize(width, height, false);
+  //   }
+  //   return needResize;
+  // }
+
+  function onWindowResize() {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize( width, height );
+    horrorComposer.setSize( width, height );
   }
   
   // Mouse events
@@ -277,9 +377,9 @@ function main(isVisible) {
         }
       })
     } else {
-      for (let genre in movieData) {
+      for (let genre in movieObjs) {
         if (genre === direction) {
-          cameraScrollIdx = movieData[genre]['idx']
+          cameraScrollIdx = movieGenreIdx[genre]
           gsap.to(camera.position, {
             duration:1,
             x: cameraStartingPos.x,
@@ -299,6 +399,7 @@ function main(isVisible) {
 
   // change background according to genre
   function changeBackground() {
+    horrorFlag = false
     switch (cameraScrollIdx) {
       case 0:
         console.log('sci-fi')
@@ -309,24 +410,23 @@ function main(isVisible) {
           b: 42,
           opacity: 1,
           onUpdate: function () {
-            console.log(currBgc)
             renderer.setClearColor(new THREE.Color(`rgb(${Math.floor(currBgc.r)}, ${Math.floor(currBgc.g)}, ${Math.floor(currBgc.b)})`), currBgc.opacity)
           }
         })
         break
         case 1:
           console.log('romance')
-          gsap.to(currBgc, {
+          gsap.to(currBgc, { 
             duration: 1,
-            r: 240,
-            g: 147,
-            b: 43,
+            r: 255,
+            g: 121,
+            b: 121,
             opacity: 0.7,
             onUpdate: function () {
-              console.log(currBgc)
               renderer.setClearColor(new THREE.Color(`rgb(${Math.floor(currBgc.r)}, ${Math.floor(currBgc.g)}, ${Math.floor(currBgc.b)})`), currBgc.opacity)
-            }
+            },
           })
+          // scene.background = new THREE.Color( 0xf0f0f0 )
         break
       case 2:
         console.log('animation')
@@ -337,7 +437,6 @@ function main(isVisible) {
           b: 88,
           opacity: 1,
           onUpdate: function () {
-            console.log(currBgc)
             renderer.setClearColor(new THREE.Color(`rgb(${Math.floor(currBgc.r)}, ${Math.floor(currBgc.g)}, ${Math.floor(currBgc.b)})`), currBgc.opacity)
           }
         })
@@ -350,7 +449,6 @@ function main(isVisible) {
           b: 223,
           opacity: 1,
           onUpdate: function () {
-            console.log(currBgc)
             renderer.setClearColor(new THREE.Color(`rgb(${Math.floor(currBgc.r)}, ${Math.floor(currBgc.g)}, ${Math.floor(currBgc.b)})`), currBgc.opacity)
           }
         })
@@ -365,7 +463,6 @@ function main(isVisible) {
           b: 251,
           opacity: 1,
           onUpdate: function () {
-            console.log(currBgc)
             renderer.setClearColor(new THREE.Color(`rgb(${Math.floor(currBgc.r)}, ${Math.floor(currBgc.g)}, ${Math.floor(currBgc.b)})`), currBgc.opacity)
           }
         })
@@ -375,13 +472,15 @@ function main(isVisible) {
         console.log('horror')
         gsap.to(currBgc, {
           duration: 1,
-          r: 19,
-          g: 15,
-          b: 64,
+          r: 5,
+          g: 5,
+          b: 5,
           opacity: 1,
           onUpdate: function () {
-            console.log(currBgc)
             renderer.setClearColor(new THREE.Color(`rgb(${Math.floor(currBgc.r)}, ${Math.floor(currBgc.g)}, ${Math.floor(currBgc.b)})`), currBgc.opacity)
+          },
+          onComplete: function () {
+            horrorFlag = true
           }
         })
 
@@ -432,6 +531,7 @@ function main(isVisible) {
 				
 				// Change object position
 				const targetObj = intersects[0].object
+        picked_movie_id.value = targetObj.movie_id
         formerMovieRotation = {x: targetObj.rotation.x, y: targetObj.rotation.y, z: targetObj.rotation.z}
 				cameraTarget.x = camera.position.x
 				cameraTarget.y = camera.position.y
@@ -566,12 +666,12 @@ function main(isVisible) {
   function render(time) {
     time *= 0.001
 
-    // on window resize
-    if (resizeRendererToDisplaySize(renderer)) {
-      const canvas = renderer.domElement
-      camera.aspect = canvas.clientWidth / canvas.clientHeight
-      camera.updateProjectionMatrix()
-    }
+    // // on window resize
+    // if (resizeRendererToDisplaySize(renderer)) {
+    //   const canvas = renderer.domElement
+    //   camera.aspect = canvas.clientWidth / canvas.clientHeight
+    //   camera.updateProjectionMatrix()
+    // }
 
     // update camera aspect
     const canvas = renderer.domElement
@@ -616,13 +716,19 @@ function main(isVisible) {
 		raycaster.setFromCamera( mouseVector, camera );
 
     // Rendering
-    renderer.render(scene, camera)
+    if (horrorFlag) {
+      frame.update( time ).updateNode( nodePass.material );
+      horrorComposer.render()
+    } else {
+      renderer.render(scene, camera)
+    }
     requestAnimationFrame(render)
   }
   requestAnimationFrame(render)
 
   ///////////////////////////////////////////////////////////////////////
   //// EventListeners
+  window.addEventListener('resize', onWindowResize)
   window.addEventListener('mouseup', onCanvasMouseUp, false);
   canvas.addEventListener('mousedown', onCanvasMouseDown, false)
   window.addEventListener('mousemove', onCanvasMouseMove, false)
