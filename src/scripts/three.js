@@ -11,14 +11,9 @@ import gsap from 'gsap'
 // data to be received from vue
 const vueData = []
 
-// input movie data from vue here
-function start(data) {
-  vueData.push(...data)
-}
-
 function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
-  // test
-  console.log(movieObjs)
+  // // test
+  // console.log(movieObjs)
 
   ////////////////////////////////////////////////////////////////////////
   //// Communication with Vue
@@ -44,7 +39,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   const cameraStartingPos = {x: 0, y:0, z: 10}
   const cameraTargetStartDist = 50
   const cameraTargetStart = {x: 0, y: 0, z: cameraTargetStartDist}
-  const cameraScrollDist = 150
+  const cameraScrollDist = 200
   const cameraZoominValue = 0.92
   let cameraTarget = {...cameraTargetStart}
   let cameraScrollIdx = 0
@@ -94,7 +89,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   // blur
   const size = renderer.getDrawingBufferSize( new THREE.Vector2() )
   const blurScreen = new Nodes.BlurNode( new Nodes.ScreenNode() )
-  const blurVal = 1.5
+  const blurVal = 0.8
   blurScreen.size = new THREE.Vector2( size.width, size.height )
   blurScreen.radius.x = blurVal
   blurScreen.radius.y = blurVal
@@ -132,8 +127,8 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   
   const movies = []
   for (let genre in movieObjs) {
-    console.log(genre)
     movieObjs[genre].forEach((movieObj, idx) => {
+      // comment this out for instant load
       makeInstance(geometry, genre, movieObj, idx)
     })
   }
@@ -202,7 +197,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
 
   //// 2. Romance
   const heartGroup = new THREE.Group()
-  heartGroup.position.set(20, 10-cameraScrollDist, 50)
+  heartGroup.position.set(20, 50-cameraScrollDist, 30)
   const x = 0, y = 0
   const heartShape = new THREE.Shape()
   .moveTo( x + 25, y + 25 )
@@ -735,4 +730,4 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   window.addEventListener('mousewheel', onCanvasScroll, false)
 }
 
-export { start, main }
+export { main }

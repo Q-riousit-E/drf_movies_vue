@@ -6,6 +6,7 @@ import ArticleDetail from '@/views/ArticleDetail.vue'
 import Signup from '@/views/Signup.vue'
 import Login from '@/views/Login.vue'
 import Logout from '@/views/Logout.vue'
+import Testing from '@/views/Testing.vue'
 
 const routes = [
   {
@@ -37,6 +38,11 @@ const routes = [
     path: '/logout',
     name: 'Logout',
     component: Logout
+  },
+  {
+    path: '/testing',
+    name: 'Testing',
+    component: Testing
   }
 ]
 

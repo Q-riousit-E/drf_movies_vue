@@ -4,14 +4,16 @@
     <router-link :to="{ name: 'Articles' }">Articles</router-link> |
     <router-link :to="{ name: 'Signup' }">Signup</router-link> |
     <router-link :to="{ name: 'Login' }">Login</router-link> | 
-    <router-link :to="{ name: 'Logout' }">Logout</router-link> 
+    <router-link :to="{ name: 'Logout' }">Logout</router-link> |
+    <router-link :to="{ name: 'Testing' }">Testing</router-link> 
+
   </div>
   <router-view/>
 </template>
 
 <style>
 body {
-  background: rgb(73, 73, 73);
+  background: black;
 }
 
 #app {
