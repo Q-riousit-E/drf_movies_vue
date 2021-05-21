@@ -1,10 +1,12 @@
 import * as THREE from 'three'
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
-import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass.js';
-import { NodePass } from 'three/examples/jsm/nodes/postprocessing/NodePass.js';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js'
+import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass.js'
+import { NodePass } from 'three/examples/jsm/nodes/postprocessing/NodePass.js'
 import * as Nodes from 'three/examples/jsm/nodes/Nodes.js'
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
+import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js'
 
 import gsap from 'gsap'
 
@@ -45,6 +47,12 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   let cameraScrollIdx = 0
   camera.position.set(cameraStartingPos.x, cameraStartingPos.y, cameraStartingPos.z)
   camera.lookAt(new THREE.Vector3(cameraTargetStart.x, cameraTargetStart.y, cameraTargetStart.z))
+
+  // // Fog
+  // const fogNear = 1
+  // const fogFar = 2
+  // const fogColor = 'lightblue'
+  // scene.fog = new THREE.Fog(fogColor, fogNear, fogFar)
 
   // Renderer
   const renderer = new THREE.WebGLRenderer({ 
@@ -134,7 +142,8 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   }
  
   function makeInstance(geometry, genre, movieObj, idx) {
-    const material = new THREE.MeshBasicMaterial({map: loader.load(movieObj.poster_path.replace('/original/', '/w500/'))})
+    // w92 for faster loading for testing -> change to w-500 for final result
+    const material = new THREE.MeshStandardMaterial({map: loader.load(movieObj.poster_path.replace('/original/', '/w92/'))})
     
     const movie = new THREE.Mesh(geometry, material);
     scene.add(movie);
@@ -195,6 +204,27 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   const starsMesh = new THREE.Points(starsGeometry, starMaterial)  
   scene.add(starsMesh)
 
+  // Amongus Character
+  const mtlLoader = new MTLLoader()
+  let character
+  let characterLoaded = false
+  let characterMoveRight = true
+  let characterMoveDown = true
+  mtlLoader.load('amongus/among us.mtl', (mtl) => {
+    mtl.preload()
+    const objLoader = new OBJLoader()
+    objLoader.setMaterials(mtl)
+    console.log(objLoader.materials)
+    objLoader.load('amongus/among us.obj', (root) => {
+      character = root
+      scene.add(character)
+      character.position.set(5*radius, 1.8*radius, 3*radius)
+      character.rotation.set(0, 180, -90)
+      character.scale.set(0.1, 0.1, 0.1)
+      characterLoaded = true
+    })
+  })
+
   //// 2. Romance
   const heartGroup = new THREE.Group()
   heartGroup.position.set(20, 50-cameraScrollDist, 30)
@@ -238,21 +268,29 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   
   /////////////////////////////////////////////////////////////////////////////////////
   //// Lights
-  // const lightTarget = new THREE.Object3D()
-  // lightTarget.position.set(0, 0, 5)
-  // scene.add(lightTarget)
-  // const color = 0xFFFFFF
-  // const intensity = 7
-  // const light1 = new THREE.DirectionalLight(color, intensity)
-  // light1.position.set(0, 10, 3)
-  // light1.target = lightTarget
-  // scene.add(light1)
-  // const light2 = new THREE.DirectionalLight(color, intensity)
-  // light2.position.set(0, 2, -5)
-  // scene.add(light2)
+  // const light0 = new THREE.PointLight( 0xffffff, 1.5 )
+  // light0.position.set(0, 0, radius*0.8)
+  // scene.add( light0 )
 
-  // const light3 = new THREE.PointLight( 0xffffff, 0.8 )
-  // camera.add( light3 )
+  const light1 = new THREE.DirectionalLight( 'rgb(245, 246, 250)', 1 )
+  light1.position.set(0, 10, 0)
+  light1.target.position.set(0, 0, radius)
+  scene.add( light1 )
+  scene.add(light1.target)
+
+  // const light2 = new THREE.SpotLight('rgb(245, 246, 250)', 10)
+  // light2.position.set(20, 20, 20)
+  // light2.target.position.set(0, 0, radius)
+  // light2.penumbra = 0.6
+  // light2.angle = 50
+  // light2.distance = 20
+  // scene.add(light2)
+  // scene.add(light2.target)
+
+  // const helper = new THREE.SpotLightHelper(light2);
+  // scene.add(helper);
+  // light2.target.updateMatrixWorld();
+
 
   //////////////////////////////////////////////////////////////////////////
   //// Events
@@ -661,13 +699,6 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   function render(time) {
     time *= 0.001
 
-    // // on window resize
-    // if (resizeRendererToDisplaySize(renderer)) {
-    //   const canvas = renderer.domElement
-    //   camera.aspect = canvas.clientWidth / canvas.clientHeight
-    //   camera.updateProjectionMatrix()
-    // }
-
     // update camera aspect
     const canvas = renderer.domElement
     camera.aspect = canvas.clientWidth / canvas.clientHeight
@@ -694,12 +725,36 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
 
     // update particles only when camera is clone enough
     if (camera.position.y > -1.5 * cameraScrollDist) {
+      if (characterLoaded) {
+        character.rotation.x += Math.random() * 0.007
+        character.rotation.y += Math.random() * 0.007
+        character.rotation.z += Math.random() * 0.007
+        if (character.position.x < -300) {
+          character.position.x = -299
+          characterMoveRight = !characterMoveRight
+        } else if (character.position.x > 300) {
+          character.position.x = 299
+          characterMoveRight = !characterMoveRight
+        }
+        if (character.position.y > 170) {
+          character.position.y = 165
+          characterMoveDown = !characterMoveDown
+        } else if (character.position.y < -50) {
+          character.position.y = -49
+          characterMoveDown = !characterMoveDown
+        }
+      }
       if (tempX === 0 && tempY === 0) {
-        // particlesMesh.rotation.x = time * 0.00002
         particlesMesh.rotation.y = time * 0.2
-        // starsMesh.rotation.x = time * 0.00002
         starsMesh.rotation.y = time * 0.2
+        if (characterLoaded) {
+          character.position.x -= characterMoveRight? 0.6 : -0.6
+        }
       } else {
+        if (characterLoaded) {
+          character.position.x -= characterMoveRight? tempX * 1 : -tempX * 1
+          character.position.y -= characterMoveDown? tempY * 0.5 : -tempY * 0.5
+        }
         particlesMesh.rotation.x = -(tempY) + time * 0.1
         particlesMesh.rotation.y = (tempX) + time * 0.1
         starsMesh.rotation.x = -(tempY) + time * 0.1

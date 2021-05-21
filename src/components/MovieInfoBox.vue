@@ -21,7 +21,6 @@ export default {
   setup(props, { emit }) {
     // Vuex
     const store = useStore()
-    const moviesObj = computed(() => store.state.movies.moviesObj)
     const picked_movie = computed(() => store.state.movies.picked_movie)
 
     // Vue comm
@@ -38,7 +37,7 @@ export default {
 
     return {
       onResetPickImage,
-      moviesObj, picked_movie
+      picked_movie
     }
   },
 }
