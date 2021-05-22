@@ -19,6 +19,14 @@
     />
   </transition>
   <ScrollNav @onClickNavMenu="handleClickNavMenu"/>
+	<section v-if="!isVisible" :class="{ invisible: loadingThree, showAnimation: !loadingThree }" class="example example--1">
+    <span class="scroll-icon">
+      <span class="scroll-icon__wheel-outer">
+        <span class="scroll-icon__wheel-inner"></span>
+      </span>
+    </span>
+    <h2>Scroll</h2>
+  </section>
 </template>
 
 <script>
@@ -96,11 +104,11 @@ export default {
   z-index: 0;
 }
 
-#c.invisible {
+.invisible {
   visibility: hidden;
 }
 
-#c.showAnimation {
+.showAnimation {
   animation: fadeIn 3s ease-in
 }
 
@@ -446,5 +454,65 @@ export default {
  .loading span.text {
    animation: title 4.4s linear 2.2s infinite;
 	 opacity: 0;
+}
+
+/* Scroll-icon  */
+.example {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+	z-index: 10;
+	position: absolute;
+	top: 94%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.scroll-icon {
+  display: block;
+  position: relative;
+  height: 4.2vh;
+  width: 2.1vh;
+  border: 0.35vh solid #fff;
+  border-radius: 1.4vh;
+}
+
+.scroll-icon__wheel-outer {
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: 0.84vh;
+  height: 1.4vh;
+  width: 0.6vh;
+  margin-left: -0.3vh;
+  border-radius: 0.56vh;
+  overflow: hidden;
+}
+
+.scroll-icon__wheel-inner {
+  display: block;
+  height: 100%;
+  width: 100%;
+  border-radius: inherit;
+  background: #fff;
+  animation: scroll_1 2.75s ease-in-out infinite;
+}
+
+h2 {
+	margin: 1vh;
+  color: white;
+  font-family: Roboto, sans-serif;
+  font-weight: 100;
+	z-index: 10;
+}
+
+@keyframes scroll_1 {
+  0%   { transform: translateY(0); }
+  25%  { transform: translateY(-0.6vh); }
+  50%  { transform: translateY(0); }
+  75%  { transform: translateY(0.6vh); }
+  100% { transform: translateY(0); }
 }
 </style>

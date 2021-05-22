@@ -5,8 +5,12 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass.js'
 import { NodePass } from 'three/examples/jsm/nodes/postprocessing/NodePass.js'
 import * as Nodes from 'three/examples/jsm/nodes/Nodes.js'
+
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
+
 import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
 
 import gsap from 'gsap'
@@ -40,9 +44,9 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   const near = 0.1
   const far = 500
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far)
-  const cameraStartingPos = {x: 0, y: 20, z: 10}
+  const cameraStartingPos = {x: 0, y: 5, z: 10}
   const cameraTargetStartDist = 50
-  const cameraTargetStart = {x: 0, y: 20, z: cameraTargetStartDist}
+  const cameraTargetStart = {x: 0, y: cameraStartingPos.y, z: cameraTargetStartDist}
   const cameraScrollDist = 200
   const cameraZoominValue = 0.92
   let cameraTarget = {...cameraTargetStart}
@@ -230,11 +234,10 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
     mtl.preload()
     const objLoader = new OBJLoader()
     objLoader.setMaterials(mtl)
-    console.log(objLoader.materials)
     objLoader.load('amongus/among us.obj', (root) => {
       character = root
       scene.add(character)
-      character.position.set(5*radius, 1.8*radius, 3*radius)
+      character.position.set(3*radius, 1.8*radius, 3*radius)
       character.rotation.set(0, 180, -90)
       character.scale.set(0.1, 0.1, 0.1)
       characterLoaded = true
@@ -282,6 +285,51 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
     heartGroup.add( mesh );
   }
   scene.add(heartGroup)
+
+  //// 3. Animation
+  let mixer
+  let playAnimation = false
+  let pokeLights
+  let pokemon
+
+  const animationFolder = gui.addFolder("Animation")
+  const dracoLoader = new DRACOLoader()
+  dracoLoader.setDecoderPath('three/examples/js/libs/draco/gltf/')
+  
+  const gltfLoader = new GLTFLoader()
+  gltfLoader.setDRACOLoader(dracoLoader)
+  gltfLoader.load('rayquaza_384/scene.gltf', function (gltf) {
+    const model = gltf.scene
+    pokemon = model
+    const pokemonScale = {val: 0.07}
+    
+    model.position.set(120, 30 - 2*cameraScrollDist, 1.3*radius)
+    // model.position.set(120, 30, 1.3*radius)
+    model.rotation.set(-0.19, -2.11, 0)
+    model.scale.set(pokemonScale.val, pokemonScale.val, pokemonScale.val)
+    scene.add(model)
+    // console.log(dumpObject(model).join('\n'));
+    pokeLights = model.getObjectByName('Sphere001')
+    pokeLights.scale.set(0.1, 0.1, 0.1)
+    
+    // animate model
+    mixer = new THREE.AnimationMixer(model)
+    mixer.clipAction(gltf.animations[0]).play()
+    playAnimation = true
+
+    // gui
+    animationFolder.add(pokemonScale, 'val').min(0.03).max(0.5).step(0.001).onChange(() => {
+      model.scale.set(pokemonScale.val, pokemonScale.val, pokemonScale.val)
+    })
+    animationFolder.add(model.position, 'x').min(-100).max(100).step(0.1)
+    animationFolder.add(model.position, 'y').min(-60).max(60).step(0.1)
+    animationFolder.add(model.position, 'z').min(4*cameraTargetStartDist).max(6*cameraTargetStartDist).step(10)
+    animationFolder.add(model.rotation, 'x').min(-3).max(3).step(0.01)
+    animationFolder.add(model.rotation, 'y').min(-3).max(3).step(0.01)
+    animationFolder.add(model.rotation, 'z').min(-3).max(3).step(0.01)
+  })
+
+
   
   /////////////////////////////////////////////////////////////////////////////////////
   //// Loading
@@ -296,28 +344,41 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   
   /////////////////////////////////////////////////////////////////////////////////////
   //// Lights
-  const light0 = new THREE.PointLight( 0xffffff, 0.27 )
-  light0.position.set(0, -2*cameraScrollDist, radius*1.4)
+  // 0. Directional Light for whole scene
+  const light0 = new THREE.DirectionalLight( 'rgb(245, 246, 250)', 1.1 )
+  light0.position.set(0, 10, 0)
+  light0.target.position.set(25, 0, radius)
   scene.add( light0 )
-  const pointLightFolder = gui.addFolder("Point Light")
-  pointLightFolder.add(light0, 'intensity', 0, 2, 0.01);
-  pointLightFolder.add(light0.position, 'x', -10, 10);
-  pointLightFolder.add(light0.position, 'z', -10, 10);
-  pointLightFolder.add(light0.position, 'y', 0, 10);
+  scene.add(light0.target)
+  const directionalLightFolder = gui.addFolder("0. Directional Light")
+  directionalLightFolder.add(light0, 'intensity', 0, 2, 0.01);
+  directionalLightFolder.add(light0.position, 'x', -10, 10);
+  directionalLightFolder.add(light0.position, 'z', -10, 10);
+  directionalLightFolder.add(light0.position, 'y', -10, 10);
+  directionalLightFolder.add(light0.target.position, 'x', -60, 60);
+  directionalLightFolder.add(light0.target.position, 'z', -60, 60);
+  directionalLightFolder.add(light0.target.position, 'y', -60, 60);
 
-  const light1 = new THREE.DirectionalLight( 'rgb(245, 246, 250)', 1.1 )
-  light1.position.set(0, 10, 0)
-  light1.target.position.set(0, 0, radius)
-  scene.add( light1 )
-  scene.add(light1.target)
-  const directionalLightFolder = gui.addFolder("Directional Light")
-  directionalLightFolder.add(light1, 'intensity', 0, 2, 0.01);
-  directionalLightFolder.add(light1.position, 'x', -10, 10);
-  directionalLightFolder.add(light1.position, 'z', -10, 10);
-  directionalLightFolder.add(light1.position, 'y', -10, 10);
-  directionalLightFolder.add(light1.target.position, 'x', -10, 10);
-  directionalLightFolder.add(light1.target.position, 'z', -10, 10);
-  directionalLightFolder.add(light1.target.position, 'y', -10, 10);
+  // 2. Romance - for hearts
+  const light2 = new THREE.PointLight( 0xffffff, 0.27 )
+  light2.position.set(0, -1*cameraScrollDist, radius*1.4)
+  scene.add( light2 )
+  const pointLightFolder2 = gui.addFolder("2. Romance Light")
+  pointLightFolder2.add(light2, 'intensity', 0, 2, 0.01);
+  pointLightFolder2.add(light2.position, 'x', -10, 10);
+  pointLightFolder2.add(light2.position, 'z', -10, 10);
+  pointLightFolder2.add(light2.position, 'y', 0, 10);
+
+  // 3. Animation - for pokemons
+  const light3 = new THREE.PointLight( 0xffffff, 0.5 )
+  light3.position.set(-2, 2*cameraScrollDist, 2*cameraTargetStartDist)
+  scene.add( light3 )
+  const pointLightFolder3 = gui.addFolder("3. Animation Light")
+  pointLightFolder3.add(light3, 'intensity', 0, 20, 0.01);
+  pointLightFolder3.add(light3.position, 'x', -10, 10);
+  pointLightFolder3.add(light3.position, 'z', 0, 100);
+  pointLightFolder3.add(light3.position, 'y', 0, 10);
+
 
   // const light2 = new THREE.SpotLight('rgb(245, 246, 250)', 10)
   // light2.position.set(20, 20, 20)
@@ -334,7 +395,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
 
   //////////////////////////////////////////////////////////////////////////
   //// Events variables
-  const mouseVector = new THREE.Vector2()
+  const mouseVector = {x: 0, y: 0}
 	const raycaster = new THREE.Raycaster()
   let picked_id = -1
   let is_clicked = false
@@ -344,6 +405,19 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   //  Utility
   function getRand(min, max) {
     return Math.random() * (max - min) + min
+  }
+
+  // GLTFloader
+  function dumpObject(obj, lines = [], isLast = true, prefix = '') {
+    const localPrefix = isLast ? '└─' : '├─';
+    lines.push(`${prefix}${prefix ? localPrefix : ''}${obj.name || '*no-name*'} [${obj.type}]`);
+    const newPrefix = prefix + (isLast ? '  ' : '│ ');
+    const lastNdx = obj.children.length - 1;
+    obj.children.forEach((child, ndx) => {
+      const isLast = ndx === lastNdx;
+      dumpObject(child, lines, isLast, newPrefix);
+    });
+    return lines;
   }
 
   // Event Handlers
@@ -361,11 +435,13 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   
 	function onCanvasMouseDown( event ) {
     event.preventDefault()
-		mouseVector.x = event.clientX
-		mouseVector.y = event.clientY
+    const rect = canvas.getBoundingClientRect()
+		mouseVector.x = (event.clientX - rect.left) * canvas.width / rect.width
+		mouseVector.y = (event.clientY - rect.top) * canvas.height / rect.height
+    console.log(mouseVector)
 		is_clicked = true
 		
-		pickImage( mouseVector );
+		pickImage()
 	}
   
 	function onCanvasMouseUp( event ) {
@@ -464,7 +540,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
     horrorFlag = false
     switch (cameraScrollIdx) {
       case 0:
-        console.log('sci-fi')
+        // 1. Sci-fi
         gsap.to(currBgc, {
           duration: 1,
           r: 33,
@@ -476,28 +552,27 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
           }
         })
         break
+        // 2. Romance
         case 1:
-          console.log('romance')
           romanceFlag = true
           gsap.to(currBgc, { 
             duration: 1,
-            r: 255,
-            g: 121,
-            b: 121,
+            r: 248,
+            g: 165,
+            b: 194,
             opacity: 0.7,
             onUpdate: function () {
               renderer.setClearColor(new THREE.Color(`rgb(${Math.floor(currBgc.r)}, ${Math.floor(currBgc.g)}, ${Math.floor(currBgc.b)})`), currBgc.opacity)
             },
           })
-          // scene.background = new THREE.Color( 0xf0f0f0 )
         break
       case 2:
-        console.log('animation')
+        // 3. Animation
         gsap.to(currBgc, {
-          duration: 1,
-          r: 186,
-          g: 220,
-          b: 88,
+          duration: 1, 
+          r: 24,
+          g: 28,
+          b: 41,
           opacity: 1,
           onUpdate: function () {
             renderer.setClearColor(new THREE.Color(`rgb(${Math.floor(currBgc.r)}, ${Math.floor(currBgc.g)}, ${Math.floor(currBgc.b)})`), currBgc.opacity)
@@ -505,7 +580,6 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
         })
         break
       case 3:
-        console.log('comedy')
         gsap.to(currBgc, { 
           r: 126,
           g: 214,
@@ -518,7 +592,6 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
 
         break
       case 4:
-        console.log('action')
         gsap.to(currBgc, { 
           duration: 1,
           r: 223,
@@ -532,7 +605,6 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
 
         break
       case 5:
-        console.log('horror')
         gsap.to(currBgc, {
           duration: 1,
           r: 5,
@@ -564,13 +636,16 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   
   const formerMovieRotation = {x: 0, y: 0, z: 0}
   const tempMovieRotation = {x: 0, y: 0, z: 0}
-	function pickImage(vector) {
+	function pickImage() {
 		if (picked_id === -1) {
 			//collision detection
 			var intersects = null
-      vector.x = (vector.x / window.innerWidth) * 2 - 1
-      vector.y = (vector.y / window.innerHeight) * 2 - 1
-			raycaster.setFromCamera(vector, camera)
+      const checkingVector = {x: -10000, y: -10000}
+      console.log(window.innerWidth)
+      checkingVector.x = (mouseVector.x / window.innerWidth) * 2 - 1
+      checkingVector.y = (mouseVector.y / window.innerHeight) * -2 + 1
+      console.log(checkingVector)
+			raycaster.setFromCamera(checkingVector, camera)
 			intersects = raycaster.intersectObjects(movieGroup.children)
 			if (intersects.length > 0 && is_clicked) {
 				
@@ -773,7 +848,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
     })
 
     // 1. Sci-fi update particles and amongus only when camera is clone enough
-    if (camera.position.y > -1 * cameraScrollDist) {
+    if (camera.position.y > -0.5 * cameraScrollDist) {
       if (characterLoaded) {
         character.rotation.x += Math.random() * 0.007
         character.rotation.y += Math.random() * 0.007
@@ -812,7 +887,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
     }
 
     // 2. Romance
-    if (camera.position.y < 0 && camera.position.y > -2 * cameraScrollDist) {
+    if (camera.position.y < -0.5 * cameraScrollDist && camera.position.y > -1.5 * cameraScrollDist) {
       heartGroup.children.forEach((heart) => {
         heart.position.x += heart.speedX * 0.7
         heart.position.y += heart.speedY * 0.7
@@ -826,6 +901,16 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
       })
     }
 
+    // 3. Animation - animate pokemon
+    if (camera.position.y < -1.5 * cameraScrollDist && camera.position.y > -2.5 * cameraScrollDist) {
+      if (playAnimation) {
+        mixer.update(0.005)
+        pokemon.position.x -= 0.09
+        if (pokemon.position.x < -120) {
+          playAnimation = false
+        }
+      }
+    }
 		// mouse interaction
 		raycaster.setFromCamera( mouseVector, camera );
 
