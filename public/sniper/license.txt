@@ -1,0 +1,11 @@
+Model Information:
+* title:	Sci-FI Sniper Rifle (Free)
+* source:	https://sketchfab.com/3d-models/sci-fi-sniper-rifle-free-2d1bef3aa9ae47c5aee26cc3f032ab31
+* author:	Matija Švaco (https://sketchfab.com/svacomatija)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Sci-FI Sniper Rifle (Free)" (https://sketchfab.com/3d-models/sci-fi-sniper-rifle-free-2d1bef3aa9ae47c5aee26cc3f032ab31) by Matija Švaco (https://sketchfab.com/svacomatija) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

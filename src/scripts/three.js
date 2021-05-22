@@ -44,6 +44,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   const near = 0.1
   const far = 500
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far)
+  // const cameraStartingPos = {x: -5, y: 5, z: 0}
   const cameraStartingPos = {x: 0, y: 5, z: 10}
   const cameraTargetStartDist = 50
   const cameraTargetStart = {x: 0, y: cameraStartingPos.y, z: cameraTargetStartDist}
@@ -236,7 +237,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
     objLoader.setMaterials(mtl)
     objLoader.load('amongus/among us.obj', (root) => {
       character = root
-      scene.add(character)
+      // scene.add(character)
       character.position.set(3*radius, 1.8*radius, 3*radius)
       character.rotation.set(0, 180, -90)
       character.scale.set(0.1, 0.1, 0.1)
@@ -295,7 +296,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   const animationFolder = gui.addFolder("Animation")
   const dracoLoader = new DRACOLoader()
   dracoLoader.setDecoderPath('three/examples/js/libs/draco/gltf/')
-  
+
   const gltfLoader = new GLTFLoader()
   gltfLoader.setDRACOLoader(dracoLoader)
   gltfLoader.load('rayquaza_384/scene.gltf', function (gltf) {
@@ -329,7 +330,110 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
     animationFolder.add(model.rotation, 'z').min(-3).max(3).step(0.01)
   })
 
+  //// 4. Action
+  // pivot to make gun rotate 
+  const pivot = new THREE.Object3D()
+  const pivotInitialPos = {x: -3.9, y: 3.6, z: 6.5}
+  pivot.position.set(pivotInitialPos.x, pivotInitialPos.y, pivotInitialPos.z)
+  const pivotSphere = new THREE.Mesh(new THREE.SphereGeometry(0.3, 0.3, 0.3), new THREE.MeshNormalMaterial())
+  pivotSphere.position.set(0, 0, 0)
+  const pivotFolder = gui.addFolder('pivot')
+  pivotFolder.add(pivot.position, 'x').min(-20).max(20).step(0.1)
+  pivotFolder.add(pivot.position, 'y').min(-20).max(20).step(0.1)
+  pivotFolder.add(pivot.position, 'z').min(-20).max(20).step(0.1)
+  pivot.add(pivotSphere)
+  scene.add(pivot)
 
+  // 0: before cocking, 1: during cocking, 2: when cocking is done
+  let gunReady = 0        
+  let actionLoaded = false
+  let gunModel
+
+  const gunLoadedPos = {x: 0.2, y: 1.4, z: 21.2}
+  const gunLoadedRot = {x: 3.2, y: 1.5, z: 3.1}
+
+  const actionFolder = gui.addFolder("Action")
+  dracoLoader.setDecoderPath('three/examples/js/libs/draco/gltf/')
+  gltfLoader.load('sniper/scene.gltf', function (gltf) {
+    const model = gltf.scene
+    gunModel = model
+
+    const targetScale = {val: 0.03}
+    pivot.add(model)
+    model.position.set(0.2 - pivotInitialPos.x, -13 - pivotInitialPos.y, 21.2 - pivotInitialPos.z)
+    model.rotation.set(3.2, 1.5, 5)
+    model.scale.set(targetScale.val, targetScale.val, targetScale.val)
+    // scene.add(model)
+
+    // gui
+    actionFolder.add(targetScale, 'val').min(0.005).max(10).step(0.01).onChange(() => {
+      model.scale.set(targetScale.val, targetScale.val, targetScale.val)
+    })
+    actionFolder.add(model.position, 'x').min(-100).max(100).step(0.1)
+    actionFolder.add(model.position, 'y').min(-60).max(60).step(0.1)
+    actionFolder.add(model.position, 'z').min(0).max(6*cameraTargetStartDist).step(0.1)
+    actionFolder.add(model.rotation, 'x').min(-Math.PI*2).max(Math.PI*2).step(0.01)
+    actionFolder.add(model.rotation, 'y').min(-Math.PI*2).max(Math.PI*2).step(0.01)
+    actionFolder.add(model.rotation, 'z').min(-Math.PI*2).max(Math.PI*2).step(0.01)
+
+    actionLoaded = true
+  })
+
+  function loadGun() {
+    gsap.to(gunModel.position, {
+      duration: 2,
+      x: gunLoadedPos.x - pivotInitialPos.x,
+      y: gunLoadedPos.y - pivotInitialPos.y,
+      z: gunLoadedPos.z - pivotInitialPos.z,
+    })
+    gsap.to(gunModel.rotation, {
+      duration: 2,
+      x: gunLoadedRot.x,
+      y: gunLoadedRot.y,
+      z: gunLoadedRot.z,
+      onComplete: function () {
+        gunReady = 2
+      }
+    })
+  }
+
+  let gunReboundPosTween, gunReboundRotTween 
+  let currGunPos, currGunRot
+  function gunRoboudMotion () {
+    console.log('rebound gun')
+    
+    // kill previous ondone rebounds
+    if (gunReboundPosTween) {
+      gunReboundPosTween.kill()
+      gunReboundRotTween.kill()
+    } else {
+      // update pos, rot if no tween happening
+      currGunPos = {...gunModel.position}
+      currGunRot = {x: gunModel.rotation.x, y: gunModel.rotation.y, z: gunModel.rotation.z}
+    }
+    
+    // jerk back motion
+    gunModel.position.set(currGunPos.x, currGunPos.y, currGunPos.z - 3)
+    gunModel.rotation.set(currGunRot.x, currGunRot.y, currGunRot.z - 0.7)
+
+    // bring gun back to former position and rotation
+    gunReboundPosTween = gsap.to(gunModel.position, {
+      duration: 1,
+      x: currGunPos.x,
+      y: currGunPos.y,
+      z: currGunPos.z,
+    })
+    gunReboundRotTween = gsap.to(gunModel.rotation, {
+      duration: 1,
+      x: currGunRot.x,
+      y: currGunRot.y,
+      z: currGunRot.z,
+    })
+  }
+
+  function shootGun() {
+    console.log('shoot gun')
+  }
   
   /////////////////////////////////////////////////////////////////////////////////////
   //// Loading
@@ -351,7 +455,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   scene.add( light0 )
   scene.add(light0.target)
   const directionalLightFolder = gui.addFolder("0. Directional Light")
-  directionalLightFolder.add(light0, 'intensity', 0, 2, 0.01);
+  directionalLightFolder.add(light0, 'intensity', 0, 10, 0.01);
   directionalLightFolder.add(light0.position, 'x', -10, 10);
   directionalLightFolder.add(light0.position, 'z', -10, 10);
   directionalLightFolder.add(light0.position, 'y', -10, 10);
@@ -408,6 +512,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   }
 
   // GLTFloader
+  // to see child components of 3D model
   function dumpObject(obj, lines = [], isLast = true, prefix = '') {
     const localPrefix = isLast ? '└─' : '├─';
     lines.push(`${prefix}${prefix ? localPrefix : ''}${obj.name || '*no-name*'} [${obj.type}]`);
@@ -438,10 +543,14 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
     const rect = canvas.getBoundingClientRect()
 		mouseVector.x = (event.clientX - rect.left) * canvas.width / rect.width
 		mouseVector.y = (event.clientY - rect.top) * canvas.height / rect.height
-    console.log(mouseVector)
 		is_clicked = true
 		
 		pickImage()
+
+    // if gun is ready and sth is clicked -> show reboud motion
+    if (gunReady === 2) {
+      gunRoboudMotion()
+    }
 	}
   
 	function onCanvasMouseUp( event ) {
@@ -633,7 +742,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
       }
     })
   }
-  
+
   const formerMovieRotation = {x: 0, y: 0, z: 0}
   const tempMovieRotation = {x: 0, y: 0, z: 0}
 	function pickImage() {
@@ -641,12 +750,12 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
 			//collision detection
 			var intersects = null
       const checkingVector = {x: -10000, y: -10000}
-      console.log(window.innerWidth)
       checkingVector.x = (mouseVector.x / window.innerWidth) * 2 - 1
       checkingVector.y = (mouseVector.y / window.innerHeight) * -2 + 1
-      console.log(checkingVector)
 			raycaster.setFromCamera(checkingVector, camera)
 			intersects = raycaster.intersectObjects(movieGroup.children)
+
+      // if movie is clicked
 			if (intersects.length > 0 && is_clicked) {
 				
 				setTimeout(() => {
@@ -739,7 +848,11 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
             }, 1100)
           }
         })
-			}
+			} else if (is_clicked && gunReady === 2) {
+        // if clicked but not movie shoot a bullet into space
+        console.log(checkingVector)
+        shootGun()      
+      }
 		}
 	}
 				
@@ -828,7 +941,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
     camera.aspect = canvas.clientWidth / canvas.clientHeight
     camera.updateProjectionMatrix()
 
-    // update movies position
+    // 0. update movies position
     movieGroup.children.forEach((movie) => {
       if (movieRotation) {
         const newRad = movie.rad + movieRotationSpeed
@@ -911,6 +1024,20 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
         }
       }
     }
+
+    // 4. Action - load gun
+    if (actionLoaded) {
+      if (gunReady === 0) {
+        loadGun()
+        gunReady = 1
+      } else if (gunReady === 2) {
+        // rotate gun around pivot
+        pivot.rotation.x = tempY > 0 ? tempY * 0.6 : tempY * 0.7
+        pivot.rotation.y = (tempX > 0 ? -tempX * 0.8 : -tempX * 0.9) - 0.07
+      }
+
+    }
+
 		// mouse interaction
 		raycaster.setFromCamera( mouseVector, camera );
 
