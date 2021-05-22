@@ -40,15 +40,17 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   const near = 0.1
   const far = 500
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far)
-  const cameraStartingPos = {x: 0, y:0, z: 10}
+  const cameraStartingPos = {x: 0, y: 20, z: 10}
   const cameraTargetStartDist = 50
-  const cameraTargetStart = {x: 0, y: 0, z: cameraTargetStartDist}
+  const cameraTargetStart = {x: 0, y: 20, z: cameraTargetStartDist}
   const cameraScrollDist = 200
   const cameraZoominValue = 0.92
   let cameraTarget = {...cameraTargetStart}
   let cameraScrollIdx = 0
   camera.position.set(cameraStartingPos.x, cameraStartingPos.y, cameraStartingPos.z)
   camera.lookAt(new THREE.Vector3(cameraTargetStart.x, cameraTargetStart.y, cameraTargetStart.z))
+  const camFolder = gui.addFolder("Camera")
+  camFolder.add(camera.position, 'y').min(0).max(30).step(0.1)
 
   // // Fog
   // const fogNear = 1
@@ -74,8 +76,8 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   // 2. Romance 
   const params = {
     exposure: 1,
-    bloomStrength: 0.32,
-    bloomThreshold: 0.25,
+    bloomStrength: 0.22,
+    bloomThreshold: 0.34,
     bloomRadius: 0
   }
   let romanceFlag = false
@@ -147,23 +149,21 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   let movieRotation = true
   let moviesFaceCam = true
   let pickedMovieFaceCam = false
-  let formerMovieRotation
   
-  const movies = []
+  const movieGroup = new THREE.Group()
+  movieGroup.position.set(0, 0, 0)
   for (let genre in movieObjs) {
     movieObjs[genre].forEach((movieObj, idx) => {
       // comment this out for instant load
       makeInstance(geometry, genre, movieObj, idx)
     })
   }
+  scene.add(movieGroup)
  
   function makeInstance(geometry, genre, movieObj, idx) {
     // w92 for faster loading for testing -> change to w-500 for final result
     const material = new THREE.MeshStandardMaterial({map: loader.load(movieObj.poster_path.replace('/original/', '/w92/'))})
-    
     const movie = new THREE.Mesh(geometry, material);
-    scene.add(movie);
-    
     const numMovies = movieObjs[genre].length
 		const rad = idx * (2*Math.PI / numMovies)
     const x = radius * Math.cos(rad)
@@ -174,7 +174,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
 		movie.rad = rad
     movie.movie_id = movieObj.id
     
-    movies.push(movie)
+    movieGroup.add(movie)
   }
   main.makeInstance = makeInstance
   
@@ -246,6 +246,9 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   heartGroup.position.set(0, -cameraScrollDist, radius * 1.6)
   const x = 0, y = 0
   const extrudeSettings = { depth: 8, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1 };
+  const heartX = 150
+  const heartMinY = -50
+  const heartMaxY = 90
   const heartShape = new THREE.Shape()
   .moveTo( x + 25, y + 25 )
   .bezierCurveTo( x + 25, y + 25, x + 20, y, x, y )
@@ -256,8 +259,8 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   .bezierCurveTo( x + 35, y, x + 25, y + 25, x + 25, y + 25 )
   
   for (let i=0; i<10; i++) {
-    const x = (Math.random()-0.5)*200
-    const y = (Math.random()-0.5)*100
+    const x = getRand(-heartX, heartX)
+    const y = getRand(heartMinY, heartMaxY)
     const rotY = getRand(-Math.PI, Math.PI)
     const size = getRand(0.04, 0.08)
     addShape( heartShape, extrudeSettings, 0xf00000, x, y, 0, 0, rotY, Math.PI, size );
@@ -277,7 +280,6 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
     mesh.speedY = speedY
     mesh.rotSpeed = rotSpeed
     heartGroup.add( mesh );
-    console.log(mesh.position)
   }
   scene.add(heartGroup)
   
@@ -294,7 +296,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   
   /////////////////////////////////////////////////////////////////////////////////////
   //// Lights
-  const light0 = new THREE.PointLight( 0xffffff, 2 )
+  const light0 = new THREE.PointLight( 0xffffff, 0.27 )
   light0.position.set(0, -2*cameraScrollDist, radius*1.4)
   scene.add( light0 )
   const pointLightFolder = gui.addFolder("Point Light")
@@ -303,7 +305,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   pointLightFolder.add(light0.position, 'z', -10, 10);
   pointLightFolder.add(light0.position, 'y', 0, 10);
 
-  const light1 = new THREE.DirectionalLight( 'rgb(245, 246, 250)', 0.7 )
+  const light1 = new THREE.DirectionalLight( 'rgb(245, 246, 250)', 1.1 )
   light1.position.set(0, 10, 0)
   light1.target.position.set(0, 0, radius)
   scene.add( light1 )
@@ -331,7 +333,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   // light2.target.updateMatrixWorld();
 
   //////////////////////////////////////////////////////////////////////////
-  //// Events
+  //// Events variables
   const mouseVector = new THREE.Vector2()
 	const raycaster = new THREE.Raycaster()
   let picked_id = -1
@@ -346,14 +348,15 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
 
   // Event Handlers
   function onWindowResize() {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+    const width = window.innerWidth
+    const height = window.innerHeight
 
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
+    camera.aspect = width / height
+    camera.updateProjectionMatrix()
 
-    renderer.setSize( width, height );
-    horrorComposer.setSize( width, height );
+    renderer.setSize( width, height )
+    romanceComposer.setSize(width, height)
+    horrorComposer.setSize(width, height)
   }
   
 	function onCanvasMouseDown( event ) {
@@ -379,7 +382,6 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
     tempY = (event.clientY/window.innerHeight - 0.5) * 2
 
     if (!is_clicked) {
-      // rotateScreenOnMouse(tempX, tempY)
       return
     }
     event.preventDefault();
@@ -389,12 +391,6 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
 		mouseVector.y = event.clientY
     rotateMovie(deltaX, deltaY)
   }
-  // function rotateScreenOnMouse(tempX, tempY) {
-    // console.log(tempX, tempY)
-    // camera.rotation.y = tempX * 0.001
-    // camera.rotation.x = tempY * 0.001
-    // camera.updateProjectionMatrix()
-  // }
   
   function onCanvasScroll (e) {
     // if (picked_id !== -1) {
@@ -420,7 +416,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
       gsap.to(camera.position, {
         duration:1,
         x: cameraStartingPos.x,
-        y: -cameraScrollIdx * cameraScrollDist,
+        y: -cameraScrollIdx * cameraScrollDist + cameraStartingPos.y,
         z: cameraStartingPos.z,
         onUpdate:function(){
           camera.updateProjectionMatrix()
@@ -435,7 +431,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
       gsap.to(camera.position, {
         duration:1,
         x: cameraStartingPos.x,
-        y: -cameraScrollIdx * cameraScrollDist,
+        y: -cameraScrollIdx * cameraScrollDist + cameraStartingPos.y,
         z: cameraStartingPos.z,
         onUpdate:function(){
           camera.updateProjectionMatrix();
@@ -448,7 +444,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
           gsap.to(camera.position, {
             duration:1,
             x: cameraStartingPos.x,
-            y: -cameraScrollIdx * cameraScrollDist,
+            y: -cameraScrollIdx * cameraScrollDist + cameraStartingPos.y,
             z: cameraStartingPos.z,
             onUpdate:function(){
               camera.updateProjectionMatrix();
@@ -558,13 +554,16 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
 
   // rotate movie to show other sides
   function rotateMovie(deltaX) {
-    movies.map((movie) => {
+    movieGroup.children.map((movie) => {
       if (movie.id === picked_id) {
         movie.rotation.y -= deltaX / 100
+        tempMovieRotation.y = movie.rotation.y
       }
     })
   }
   
+  const formerMovieRotation = {x: 0, y: 0, z: 0}
+  const tempMovieRotation = {x: 0, y: 0, z: 0}
 	function pickImage(vector) {
 		if (picked_id === -1) {
 			//collision detection
@@ -572,7 +571,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
       vector.x = (vector.x / window.innerWidth) * 2 - 1
       vector.y = (vector.y / window.innerHeight) * 2 - 1
 			raycaster.setFromCamera(vector, camera)
-			intersects = raycaster.intersectObjects(scene.children)
+			intersects = raycaster.intersectObjects(movieGroup.children)
 			if (intersects.length > 0 && is_clicked) {
 				
 				setTimeout(() => {
@@ -596,13 +595,26 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
 				document.body.classList.add('is-pointed')
         picked_id = intersects[0].object.id
 				
-				// Change object position
+				// Change camera position
 				const targetObj = intersects[0].object
         picked_movie_id.value = targetObj.movie_id
-        formerMovieRotation = {x: targetObj.rotation.x, y: targetObj.rotation.y, z: targetObj.rotation.z}
+        formerMovieRotation.x = targetObj.rotation.x
+        formerMovieRotation.y = targetObj.rotation.y
+        formerMovieRotation.z = targetObj.rotation.z
+
+        // save camera target position before movement for resetPick camera lookat
 				cameraTarget.x = camera.position.x
 				cameraTarget.y = camera.position.y
 				cameraTarget.z = cameraTargetStartDist
+        gsap.to(camera.position, {
+          duration:gsapDuration,
+          x: Math.cos(targetObj.rad) * radius * cameraZoominValue, 
+          y: targetObj.position.y, 
+          z: Math.sin(targetObj.rad) * radius * cameraZoominValue,
+          onUpdate:function(){
+            camera.updateProjectionMatrix();
+          }
+        })
 				gsap.to(cameraTarget, {
 					duration: gsapDuration,
 					x:targetObj.position.x, 
@@ -613,24 +625,19 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
             camera.updateProjectionMatrix();
           }
 				})
-				gsap.to(camera.position, {
-					duration:gsapDuration,
-					x: Math.cos(targetObj.rad) * radius * cameraZoominValue, 
-					y: targetObj.position.y, 
-					z: Math.sin(targetObj.rad) * radius * cameraZoominValue,
-					onUpdate:function(){
-						camera.updateProjectionMatrix();
-					}
-				})
         // make movie smaller to prevent overlap
-        movies.forEach((movie) => {
+        movieGroup.children.forEach((movie) => {
           if (movie.id === picked_id) {
             gsap.to(movieEnlargeScale, {
               duration: gsapDuration,
               value: movieEnlargeScale.goal,
               onUpdate: function () {
-                // console.log(movieEnlargeScale.value)
                 movie.scale.set(movieEnlargeScale.value, movieEnlargeScale.value, movieEnlargeScale.value)
+              },
+              onComplete: function () {
+                tempMovieRotation.x = movie.rotation.x
+                tempMovieRotation.y = movie.rotation.y
+                tempMovieRotation.z = movie.rotation.z
               }
             })
             // set movie to left after camera movement
@@ -649,6 +656,9 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
                 z: camera.position.z,
                 onUpdate: function () {
                   movie.lookAt(tempLookat.x, camera.position.y, tempLookat.z)
+                },
+                onComplete: function () {
+                  tempMovieRotation.y = movie.rotation.y
                 }
               })
             }, 1100)
@@ -677,30 +687,31 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
 			camera.far = 10000
 			camera.updateProjectionMatrix();
 
-			//Change object position 
+			//Change camera position 
+      const currY = camera.position.y
+      gsap.to(camera.position, {
+        duration: gsapDuration, 
+        x: cameraStartingPos.x, 
+        y: currY + cameraStartingPos.y, 
+        z: cameraStartingPos.z,
+        onUpdate: function (){
+          camera.updateProjectionMatrix()
+        }
+      })
 			gsap.to(cameraTarget, {
 				duration: gsapDuration, 
 				x:cameraTargetStart.x, 
-				y:camera.position.y, 
+				y:currY + cameraStartingPos.y, 
 				z:cameraTargetStart.z,
         onUpdate: function (){
           camera.lookAt(cameraTarget.x, cameraTarget.y, cameraTarget.z)
           camera.updateProjectionMatrix()
         }
 			})
-      const currY = camera.position.y
-			gsap.to(camera.position, {
-				duration: gsapDuration, 
-				x: cameraStartingPos.x, 
-				y: currY, 
-				z: cameraStartingPos.z,
-				onUpdate: function (){
-          camera.updateProjectionMatrix()
-				}
-			})
-      movies.forEach((movie) => {
-        let tempMovieRotation = {x: movie.rotation.x, y: movie.rotation.y, z: movie.rotation.z}
+      movieGroup.children.forEach((movie) => {
         if (movie.id === picked_id) {
+          console.log('former rotation:', formerMovieRotation)
+          console.log('curr rotation:', tempMovieRotation)
           gsap.to(movie.position, {
             duration: gsapDuration,
             x: movie.x,
@@ -708,9 +719,13 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
           })
           gsap.to(tempMovieRotation, {
             duration: gsapDuration,
+            x: formerMovieRotation.x,
             y: formerMovieRotation.y,
+            z: formerMovieRotation.z,
             onUpdate: function () {
+              movie.rotation.x = tempMovieRotation.x
               movie.rotation.y = tempMovieRotation.y
+              movie.rotation.z = tempMovieRotation.z
             }
           })
           gsap.to(movieEnlargeScale, {
@@ -739,7 +754,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
     camera.updateProjectionMatrix()
 
     // update movies position
-    movies.forEach((movie) => {
+    movieGroup.children.forEach((movie) => {
       if (movieRotation) {
         const newRad = movie.rad + movieRotationSpeed
         movie.rad = newRad > 2 * Math.PI ? newRad - 2 * Math.PI : newRad
@@ -758,7 +773,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
     })
 
     // 1. Sci-fi update particles and amongus only when camera is clone enough
-    if (camera.position.y > -1.5 * cameraScrollDist) {
+    if (camera.position.y > -1 * cameraScrollDist) {
       if (characterLoaded) {
         character.rotation.x += Math.random() * 0.007
         character.rotation.y += Math.random() * 0.007
@@ -773,8 +788,8 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
         if (character.position.y > 170) {
           character.position.y = 165
           characterMoveDown = !characterMoveDown
-        } else if (character.position.y < -50) {
-          character.position.y = -49
+        } else if (character.position.y < -15) {
+          character.position.y = -14
           characterMoveDown = !characterMoveDown
         }
       }
@@ -797,15 +812,15 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
     }
 
     // 2. Romance
-    if (camera.position.y < 0 && camera.position.y > -2.5 * cameraScrollDist) {
+    if (camera.position.y < 0 && camera.position.y > -2 * cameraScrollDist) {
       heartGroup.children.forEach((heart) => {
         heart.position.x += heart.speedX * 0.7
         heart.position.y += heart.speedY * 0.7
         heart.rotation.y += heart.rotSpeed
-        if (heart.position.x > 150 || heart.position.x < -150) {
+        if (heart.position.x > heartX || heart.position.x < -heartX) {
           heart.speedX *= -1
         }
-        if (heart.position.y > 70 || heart.position.y < -70) {
+        if (heart.position.y > heartMaxY || heart.position.y < heartMinY) {
           heart.speedY *= -1
         }
       })
