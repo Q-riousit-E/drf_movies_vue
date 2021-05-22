@@ -167,7 +167,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
  
   function makeInstance(geometry, genre, movieObj, idx) {
     // w92 for faster loading for testing -> change to w-500 for final result
-    const material = new THREE.MeshStandardMaterial({map: loader.load(movieObj.poster_path.replace('/original/', '/w92/'))})
+    const material = new THREE.MeshStandardMaterial({map: loader.load(movieObj.poster_path.replace('/original/', '/w500/'))})
     const movie = new THREE.Mesh(geometry, material);
     const numMovies = movieObjs[genre].length
 		const rad = idx * (2*Math.PI / numMovies)
@@ -237,7 +237,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
     objLoader.setMaterials(mtl)
     objLoader.load('amongus/among us.obj', (root) => {
       character = root
-      // scene.add(character)
+      scene.add(character)
       character.position.set(3*radius, 1.8*radius, 3*radius)
       character.rotation.set(0, 180, -90)
       character.scale.set(0.1, 0.1, 0.1)
@@ -334,19 +334,13 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   // pivot to make gun rotate 
   const pivot = new THREE.Object3D()
   const pivotInitialPos = {x: -3.9, y: 3.6, z: 6.5}
-  pivot.position.set(pivotInitialPos.x, pivotInitialPos.y, pivotInitialPos.z)
-  const pivotSphere = new THREE.Mesh(new THREE.SphereGeometry(0.3, 0.3, 0.3), new THREE.MeshNormalMaterial())
-  pivotSphere.position.set(0, 0, 0)
-  const pivotFolder = gui.addFolder('pivot')
-  pivotFolder.add(pivot.position, 'x').min(-20).max(20).step(0.1)
-  pivotFolder.add(pivot.position, 'y').min(-20).max(20).step(0.1)
-  pivotFolder.add(pivot.position, 'z').min(-20).max(20).step(0.1)
-  pivot.add(pivotSphere)
+  pivot.position.set(pivotInitialPos.x, pivotInitialPos.y - 3*cameraScrollDist, pivotInitialPos.z)
+  pivot.rotation.set(0, 0, 0)
   scene.add(pivot)
 
   // 0: before cocking, 1: during cocking, 2: when cocking is done
   let gunReady = 0        
-  let actionLoaded = false
+  let actionFlag = false
   let gunModel
 
   const gunLoadedPos = {x: 0.2, y: 1.4, z: 21.2}
@@ -363,7 +357,6 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
     model.position.set(0.2 - pivotInitialPos.x, -13 - pivotInitialPos.y, 21.2 - pivotInitialPos.z)
     model.rotation.set(3.2, 1.5, 5)
     model.scale.set(targetScale.val, targetScale.val, targetScale.val)
-    // scene.add(model)
 
     // gui
     actionFolder.add(targetScale, 'val').min(0.005).max(10).step(0.01).onChange(() => {
@@ -375,19 +368,19 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
     actionFolder.add(model.rotation, 'x').min(-Math.PI*2).max(Math.PI*2).step(0.01)
     actionFolder.add(model.rotation, 'y').min(-Math.PI*2).max(Math.PI*2).step(0.01)
     actionFolder.add(model.rotation, 'z').min(-Math.PI*2).max(Math.PI*2).step(0.01)
-
-    actionLoaded = true
   })
 
   function loadGun() {
     gsap.to(gunModel.position, {
-      duration: 2,
+      duration: 0.5,
+      ease: 'expo',
       x: gunLoadedPos.x - pivotInitialPos.x,
       y: gunLoadedPos.y - pivotInitialPos.y,
       z: gunLoadedPos.z - pivotInitialPos.z,
     })
     gsap.to(gunModel.rotation, {
-      duration: 2,
+      duration: 0.5,
+      ease: 'expo',
       x: gunLoadedRot.x,
       y: gunLoadedRot.y,
       z: gunLoadedRot.z,
@@ -411,7 +404,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
       currGunPos = {...gunModel.position}
       currGunRot = {x: gunModel.rotation.x, y: gunModel.rotation.y, z: gunModel.rotation.z}
     }
-    
+
     // jerk back motion
     gunModel.position.set(currGunPos.x, currGunPos.y, currGunPos.z - 3)
     gunModel.rotation.set(currGunRot.x, currGunRot.y, currGunRot.z - 0.7)
@@ -433,6 +426,17 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
 
   function shootGun() {
     console.log('shoot gun')
+  }
+
+
+  // reset gun and pivot to initial state
+  function putGunDown () {
+    pivot.position.set(pivotInitialPos.x, pivotInitialPos.y - 3*cameraScrollDist, pivotInitialPos.z)
+    pivot.rotation.set(0, 0, 0)
+    gunModel.position.set(0.2 - pivotInitialPos.x, -13 - pivotInitialPos.y, 21.2 - pivotInitialPos.z)
+    gunModel.rotation.set(3.2, 1.5, 5)
+
+    gunReady = 0
   }
   
   /////////////////////////////////////////////////////////////////////////////////////
@@ -645,11 +649,17 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
 
   // change background according to genre
   function changeBackground() {
+    // reset other scene flags
     romanceFlag = false
     horrorFlag = false
+    actionFlag = false
+    if (gunReady == 2) {
+      putGunDown()
+    }
+
     switch (cameraScrollIdx) {
+      // 1. Sci-fi
       case 0:
-        // 1. Sci-fi
         gsap.to(currBgc, {
           duration: 1,
           r: 33,
@@ -661,22 +671,24 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
           }
         })
         break
-        // 2. Romance
-        case 1:
-          romanceFlag = true
-          gsap.to(currBgc, { 
-            duration: 1,
-            r: 248,
-            g: 165,
-            b: 194,
-            opacity: 0.7,
-            onUpdate: function () {
-              renderer.setClearColor(new THREE.Color(`rgb(${Math.floor(currBgc.r)}, ${Math.floor(currBgc.g)}, ${Math.floor(currBgc.b)})`), currBgc.opacity)
-            },
-          })
+
+      // 2. Romance
+      case 1:
+        romanceFlag = true
+        gsap.to(currBgc, { 
+          duration: 1,
+          r: 248,
+          g: 165,
+          b: 194,
+          opacity: 0.7,
+          onUpdate: function () {
+            renderer.setClearColor(new THREE.Color(`rgb(${Math.floor(currBgc.r)}, ${Math.floor(currBgc.g)}, ${Math.floor(currBgc.b)})`), currBgc.opacity)
+          },
+        })
         break
+
+      // 3. Animation
       case 2:
-        // 3. Animation
         gsap.to(currBgc, {
           duration: 1, 
           r: 24,
@@ -688,6 +700,8 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
           }
         })
         break
+      
+      // 4. Comedy => to be changed to Action
       case 3:
         gsap.to(currBgc, { 
           r: 126,
@@ -696,10 +710,13 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
           opacity: 1,
           onUpdate: function () {
             renderer.setClearColor(new THREE.Color(`rgb(${Math.floor(currBgc.r)}, ${Math.floor(currBgc.g)}, ${Math.floor(currBgc.b)})`), currBgc.opacity)
+          },
+          onComplete: function () {
+            actionFlag = true
           }
         })
-
         break
+
       case 4:
         gsap.to(currBgc, { 
           duration: 1,
@@ -711,8 +728,9 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
             renderer.setClearColor(new THREE.Color(`rgb(${Math.floor(currBgc.r)}, ${Math.floor(currBgc.g)}, ${Math.floor(currBgc.b)})`), currBgc.opacity)
           }
         })
-
         break
+      
+      // 5. Horro
       case 5:
         gsap.to(currBgc, {
           duration: 1,
@@ -727,7 +745,6 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
             horrorFlag = true
           }
         })
-
         break
     }
 
@@ -850,7 +867,6 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
         })
 			} else if (is_clicked && gunReady === 2) {
         // if clicked but not movie shoot a bullet into space
-        console.log(checkingVector)
         shootGun()      
       }
 		}
@@ -1000,7 +1016,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
     }
 
     // 2. Romance
-    if (camera.position.y < -0.5 * cameraScrollDist && camera.position.y > -1.5 * cameraScrollDist) {
+    if (camera.position.y < -0.8 * cameraScrollDist && camera.position.y > -1.2 * cameraScrollDist) {
       heartGroup.children.forEach((heart) => {
         heart.position.x += heart.speedX * 0.7
         heart.position.y += heart.speedY * 0.7
@@ -1015,7 +1031,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
     }
 
     // 3. Animation - animate pokemon
-    if (camera.position.y < -1.5 * cameraScrollDist && camera.position.y > -2.5 * cameraScrollDist) {
+    if (camera.position.y < -1.8 * cameraScrollDist && camera.position.y > -2.2 * cameraScrollDist) {
       if (playAnimation) {
         mixer.update(0.005)
         pokemon.position.x -= 0.09
@@ -1026,16 +1042,19 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
     }
 
     // 4. Action - load gun
-    if (actionLoaded) {
-      if (gunReady === 0) {
-        loadGun()
-        gunReady = 1
-      } else if (gunReady === 2) {
-        // rotate gun around pivot
-        pivot.rotation.x = tempY > 0 ? tempY * 0.6 : tempY * 0.7
-        pivot.rotation.y = (tempX > 0 ? -tempX * 0.8 : -tempX * 0.9) - 0.07
+    if (camera.position.y < -2.8 * cameraScrollDist && camera.position.y > -3.2 * cameraScrollDist) {
+      if (actionFlag) {
+        if (gunReady === 0) {
+          setTimeout(() => {
+            loadGun()
+            gunReady = 1
+          }, 1000)
+        } else if (gunReady === 2) {
+          // rotate gun around pivot
+          pivot.rotation.x = tempY > 0 ? tempY * 0.6 : tempY * 0.7
+          pivot.rotation.y = (tempX > 0 ? -tempX * 0.8 : -tempX * 0.9) - 0.07
+        }
       }
-
     }
 
 		// mouse interaction
