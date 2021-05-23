@@ -1,5 +1,5 @@
 <template>
-  <MovieInfoBox @onResetPickImage="onResetPickImage" v-if="false"/>
+  <MovieInfoBox @onResetPickImage="onResetPickImage" v-if="true"/>
   <div class="wrap" v-if="false">
     <div class="bg">
       <div class="loading">

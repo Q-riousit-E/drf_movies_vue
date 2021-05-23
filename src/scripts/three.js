@@ -16,8 +16,6 @@ import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
 import gsap from 'gsap'
 
 // data to be received from vue
-const vueData = []
-
 function main(movieObjs, isVisible, loadingThree, picked_movie_id, currMovieGenre) {
   // // test
   // console.log(movieObjs)

@@ -1,5 +1,8 @@
 <template>
+	<!-- Three.js canvas -->
   <canvas id="c" :class="{ invisible: loadingThree, showAnimation: !loadingThree }"></canvas>
+
+	<!-- Loading comments -->
   <div class="wrap" v-if="loadingThree">
     <div class="bg">
       <div class="loading">
@@ -8,16 +11,26 @@
       </div>
     </div>
   </div>
+
+	<!-- Progress Bar -->
   <div id="loading" v-if="loadingThree">
     <div class="progress"><div class="progressbar"></div></div>
   </div>
+
+	<!-- Movie Info Box -->
   <transition name="switch">
     <MovieInfoBox 
       v-if="isVisible"
       @onResetPickImage="onResetPickImage"
     />
   </transition>
-  <ScrollNav @onClickNavMenu="handleClickNavMenu" :currMovieGenre="currMovieGenre"/>
+
+	<!-- MUST FIX TRANSITION -->
+	<transition name="fade">
+		<ScrollNav @onClickNavMenu="handleClickNavMenu" :currMovieGenre="currMovieGenre" v-show="!isVisible" />
+	</transition>
+
+	<!-- Scroll Icon -->
 	<section v-if="!isVisible" :class="{ invisible: loadingThree, showAnimation: !loadingThree }" class="example example--1">
     <span class="scroll-icon">
       <span class="scroll-icon__wheel-outer">
@@ -115,7 +128,7 @@ export default {
 }
 
 .showAnimation {
-  animation: fadeIn 3s ease-in
+  animation: fadeIn 4s ease-in
 }
 
 @keyframes fadeIn {
@@ -152,7 +165,7 @@ export default {
 }
 
 
-/* Switch trasitions */
+/* Trasitions */
 .switch-enter-from,
 .switch-leave-to {
   opacity: 0;
@@ -165,6 +178,16 @@ export default {
 
 .switch-leave-active {
   transition: all 0.1s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+	opacity: 0;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+	transition: all 1.3 ease;
 }
 
 /* Loading Text */
@@ -424,7 +447,7 @@ export default {
 	 padding: 30px 30px 30px 0;
 	 background: #306f99;
    animation: bg 3s linear infinite;
-   box-shadow: inset 0 0 45px 30px black;
+   box-shadow: inset 0 0 45px 30px rgb(30 40 42);
 }
 .loading {
 	 position: relative;

@@ -7,7 +7,6 @@ import Signup from '@/views/Signup.vue'
 import Login from '@/views/Login.vue'
 import Logout from '@/views/Logout.vue'
 import Testing from '@/views/Testing.vue'
-import GraphView from '@/views/GraphView.vue'
 
 const routes = [
   {
@@ -45,11 +44,6 @@ const routes = [
     name: 'Testing',
     component: Testing
   },
-  {
-    path: '/graphView',
-    name: 'GraphView',
-    component: GraphView
-  }
 ]
 
 const router = createRouter({

@@ -1,24 +1,27 @@
 <template>
   <div id="nav">
     <router-link :to="{ name: 'Home' }">Home</router-link> |
-    <!-- <router-link v-slot="{ Home }">
-      Home
-      <keep-alive>
-        <component :is="Home" />
-      </keep-alive>
-    </router-link> | -->
     <router-link :to="{ name: 'Articles' }">Articles</router-link> |
     <router-link :to="{ name: 'Signup' }">Signup</router-link> |
     <router-link :to="{ name: 'Login' }">Login</router-link> | 
     <router-link :to="{ name: 'Logout' }">Logout</router-link> |
     <router-link :to="{ name: 'Testing' }">Testing</router-link> |
-    <router-link :to="{ name: 'GraphView' }">GraphView</router-link> 
   </div>
   <router-view/>
+
+  <!-- MUST FIX: stop three from reloading  -->
+  <!-- <router-view v-slot="Home">
+    <transition>
+      <keep-alive>
+        <component :is="Home" />
+      </keep-alive>
+    </transition>
+  </router-view> -->
 </template>
 <script>
 import { defineComponent } from 'vue'
 import gsap from 'gsap'
+import Home from '@/views/Home.vue'
 
 export default defineComponent({
   // custom cursor
@@ -93,6 +96,10 @@ export default defineComponent({
     }, false);
     window.addEventListener('touchend', mouseup, false);
     window.addEventListener('mouseup', mouseup, false);
+
+    return {
+      Home
+    }
   },
 })
 </script>
@@ -107,7 +114,7 @@ export default defineComponent({
 }
 
 body {
-  background: black;
+  background: rgb(30 40 42);
 }
 
 #app {
@@ -121,7 +128,7 @@ body {
 #nav {
   padding: 30px;
   position: relative;
-  z-index: 2;
+  z-index: 3;
 }
 
 #nav a {

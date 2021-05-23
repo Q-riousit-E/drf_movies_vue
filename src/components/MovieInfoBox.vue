@@ -1,10 +1,12 @@
 <template>
-  <div class="movie-info-box">
-    <h1>Movie title: {{ picked_movie.title }}</h1>
-    <p>Movie ratings: {{ picked_movie.vote_average }}</p>
+  <div class="container movie-info-box px-5">
+    <h1 class="mt-5">{{ picked_movie.title }}</h1>
+    <p></p>
+    <StarRating :rating="picked_movie.vote_average"/>
+    <hr class="mt-4">
+    <p class="movie-overview">{{ picked_movie.overview }}</p>
     <a href="#">Movie Details {{ picked_movie.id }}</a>
-    <!-- <p>trailer path: {{ picked_movie.trailer_path }}</p> -->
-  	<iframe v-if="true" width="420" height="315" :src="picked_movie.trailer_path" frameborder="0"></iframe>
+  	<!-- <iframe width="420" height="315" :src="picked_movie.trailer_path" frameborder="0"></iframe> -->
   </div>
 </template>
 
@@ -12,16 +14,19 @@
 import { computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
 
-// import { RadarChart } from '../scripts/radarChart.js'
+import StarRating from '@/components/StarRating.vue'
 
 export default {
   name: 'MovieInfoBox',
+  components: {
+    StarRating,
+  },
   setup(props, { emit }) {
     // Vuex
     const store = useStore()
     const picked_movie = computed(() => store.state.movies.picked_movie)
 
-    // Vue comm
+    // Comm with three
     const onResetPickImage = () => {
       emit('onResetPickImage')
     }
@@ -36,7 +41,8 @@ export default {
 
 <style>
 .movie-info-box {
-  background: rgb(255, 255, 255, 0.4);
+  /* background: rgb(255, 255, 255, 0.7); */
+  background: rgb(0, 0, 0, 0.7);
   position: fixed;
   z-index: 50;
   left: 50%;
@@ -47,15 +53,20 @@ export default {
   width: 50vw;
   height: 60vh;
   text-align: center;
-  color: rgb(31, 31, 31);
+  color: white;
   text-decoration: none;
   line-height: 50px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-start;
   border-radius: 10px;
+  text-align: left;
   /* box-shadow: ; */
+}
+
+.movie-overview {
+  text-align: left;
+}
+
+.checked {
+  color: orange;
 }
 
 </style>
