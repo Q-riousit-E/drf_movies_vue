@@ -45,35 +45,37 @@ export default {
     // Get articles
     const articles = ref([])
     const getArticles = () => {
-      axios({
-        method: 'get',
-        url: '/api/v1/articles/',
-      })
-        .then((res) => {
-          console.log(res)
-          articles.value = res.data
-        })
-        .catch((err) => {
-          console.log(err)
-        })
+      // axios({
+      //   method: 'get',
+      //   url: '/api/v1/articles/',
+      // })
+      //   .then((res) => {
+      //     console.log(res)
+      //     articles.value = res.data
+      //   })
+      //   .catch((err) => {
+      //     console.log(err)
+      //   })
     }
 
     // Create new Article
-    const store = useStore()
-    const token = computed(() => store.state.auth.token)
-
-    // // 이거 받아오는게 조금 이상해서 일단은 그냥 token 여기서 바로 decode 해서 써보기
-    // const user_id = computed(() => store.getters['auth/decodedToken'].value)
-    // console.log(user_id)
-    const decodedToken = jwt_decode(token.value.token)
-    console.log(decodedToken)
     const newArticle = ref({
       title:'',
       content:'',
-      user_id: decodedToken.user_id
+      user_id: ''
     })
     const onSubmitNewArticle = (e) => {
       e.preventDefault()
+
+      const store = useStore()
+      const token = computed(() => store.state.auth.token)
+  
+      // // 이거 받아오는게 조금 이상해서 일단은 그냥 token 여기서 바로 decode 해서 써보기
+      // const user_id = computed(() => store.getters['auth/decodedToken'].value)
+      // console.log(user_id)
+      const decodedToken = jwt_decode(token.value.token)
+      console.log(decodedToken)
+      newArticle.value.user_id = decodedToken.user_id
       axios({
         method: 'post',
         url: '/api/v1/articles/',

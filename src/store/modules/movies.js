@@ -2,7 +2,8 @@ import axios from 'axios'
 
 const state = {
   moviesObj: null,
-  picked_movie: null
+  picked_movie: null,
+  currMovieGenre: 'sci_fi'
 }
 
 const mutations = {
@@ -11,6 +12,9 @@ const mutations = {
   },
   SET_PICKED_MOVIE(state, movie) {
     state.picked_movie = movie
+  },
+  SET_CURR_MOVIE_GENRE(state, currMovieGenre) {
+    state.currMovieGenre = currMovieGenre
   }
 }
 
@@ -41,6 +45,9 @@ const actions = {
     .catch((err) => {
       console.log(err)
     })
+  },
+  changeCurrMovieGenre({ commit }, currMovieGenre) {
+    commit('SET_CURR_MOVIE_GENRE', currMovieGenre)
   }
 }
 

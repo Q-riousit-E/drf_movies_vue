@@ -18,7 +18,7 @@ import gsap from 'gsap'
 // data to be received from vue
 const vueData = []
 
-function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
+function main(movieObjs, isVisible, loadingThree, picked_movie_id, currMovieGenre) {
   // // test
   // console.log(movieObjs)
 
@@ -147,13 +147,13 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
     'sci_fi': 0,
     'romance': 1,
     'animation': 2,
-    'comedy': 3,
-    'action': 4,
-    'horror': 5
+    'action': 3,
+    'horror': 4
   }
   let movieRotation = true
   let moviesFaceCam = true
   let pickedMovieFaceCam = false
+  let pickedMovieStartRotating = false
   
   const movieGroup = new THREE.Group()
   movieGroup.position.set(0, 0, 0)
@@ -167,7 +167,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
  
   function makeInstance(geometry, genre, movieObj, idx) {
     // w92 for faster loading for testing -> change to w-500 for final result
-    const material = new THREE.MeshStandardMaterial({map: loader.load(movieObj.poster_path.replace('/original/', '/w500/'))})
+    const material = new THREE.MeshStandardMaterial({map: loader.load(movieObj.poster_path.replace('/original/', '/w92/'))})
     const movie = new THREE.Mesh(geometry, material);
     const numMovies = movieObjs[genre].length
 		const rad = idx * (2*Math.PI / numMovies)
@@ -598,7 +598,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
       return
     }
     if (direction === 'down') {
-      if (cameraScrollIdx === 5) {
+      if (cameraScrollIdx === 4) {
         return
       }
       cameraScrollIdx += 1
@@ -660,6 +660,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
     switch (cameraScrollIdx) {
       // 1. Sci-fi
       case 0:
+        currMovieGenre.value = 'sci_fi'
         gsap.to(currBgc, {
           duration: 1,
           r: 33,
@@ -675,6 +676,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
       // 2. Romance
       case 1:
         romanceFlag = true
+        currMovieGenre.value = 'romance'
         gsap.to(currBgc, { 
           duration: 1,
           r: 248,
@@ -689,6 +691,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
 
       // 3. Animation
       case 2:
+        currMovieGenre.value = 'animation'
         gsap.to(currBgc, {
           duration: 1, 
           r: 24,
@@ -701,8 +704,9 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
         })
         break
       
-      // 4. Comedy => to be changed to Action
+      // 4. Action
       case 3:
+        currMovieGenre.value = 'action'
         gsap.to(currBgc, { 
           r: 126,
           g: 214,
@@ -716,22 +720,10 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
           }
         })
         break
-
-      case 4:
-        gsap.to(currBgc, { 
-          duration: 1,
-          r: 223,
-          g: 249,
-          b: 251,
-          opacity: 1,
-          onUpdate: function () {
-            renderer.setClearColor(new THREE.Color(`rgb(${Math.floor(currBgc.r)}, ${Math.floor(currBgc.g)}, ${Math.floor(currBgc.b)})`), currBgc.opacity)
-          }
-        })
-        break
       
-      // 5. Horro
-      case 5:
+      // 5. Horror
+      case 4:
+        currMovieGenre.value = 'horror'
         gsap.to(currBgc, {
           duration: 1,
           r: 5,
@@ -763,15 +755,13 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
   const formerMovieRotation = {x: 0, y: 0, z: 0}
   const tempMovieRotation = {x: 0, y: 0, z: 0}
 	function pickImage() {
+    let intersects = null
+    const checkingVector = {x: -10000, y: -10000}
+    checkingVector.x = (mouseVector.x / window.innerWidth) * 2 - 1
+    checkingVector.y = (mouseVector.y / window.innerHeight) * -2 + 1
+    raycaster.setFromCamera(checkingVector, camera)
+    intersects = raycaster.intersectObjects(movieGroup.children)
 		if (picked_id === -1) {
-			//collision detection
-			var intersects = null
-      const checkingVector = {x: -10000, y: -10000}
-      checkingVector.x = (mouseVector.x / window.innerWidth) * 2 - 1
-      checkingVector.y = (mouseVector.y / window.innerHeight) * -2 + 1
-			raycaster.setFromCamera(checkingVector, camera)
-			intersects = raycaster.intersectObjects(movieGroup.children)
-
       // if movie is clicked
 			if (intersects.length > 0 && is_clicked) {
 				
@@ -860,6 +850,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
                 },
                 onComplete: function () {
                   tempMovieRotation.y = movie.rotation.y
+                  pickedMovieStartRotating = true
                 }
               })
             }, 1100)
@@ -869,7 +860,10 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
         // if clicked but not movie shoot a bullet into space
         shootGun()      
       }
-		}
+    // when clicking outside of overview page when movie is picked
+    } else if (intersects.length === 0) {
+      resetPickImage()
+    }
 	}
 				
 	function resetPickImage() {
@@ -880,6 +874,9 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
 
       // picked Movie Faces Cam
       pickedMovieFaceCam = false
+
+      // picked movie stops auto rotating
+      pickedMovieStartRotating = false
       
       setTimeout(() => {
         // resume movie ratation
@@ -973,6 +970,10 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id) {
       }
       if (pickedMovieFaceCam && moviesFaceCam && movie.id === picked_id) {
         movie.lookAt(camera.position)
+      }
+      if (movie.id === picked_id && pickedMovieStartRotating) {
+        movie.rotation.y += 0.005
+        tempMovieRotation.y = movie.rotation.y
       }
     })
 

@@ -1,6 +1,6 @@
 <template>
   <MovieInfoBox @onResetPickImage="onResetPickImage" v-if="false"/>
-  <div class="wrap">
+  <div class="wrap" v-if="false">
     <div class="bg">
       <div class="loading">
         <span class="title">loading</span>
@@ -8,7 +8,7 @@
       </div>
     </div>
   </div>
-	<iframe width="420" height="315" src="https://www.youtube.com/embed/ul7wcneBjOI" frameborder="0"></iframe>
+	<iframe v-if="false" width="420" height="315" src="https://www.youtube.com/embed/ul7wcneBjOI" frameborder="0"></iframe>
 </template>
 
 <script>

@@ -21,3 +21,7 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 ### 3D model source
 - [Among us](https://www.cgtrader.com/free-3d-models/character/sci-fi/among-us-character-cb3e5b58-f246-4e71-a3e1-0991935eb60f)
 - [pokemon]"Rayquaza #384" (https://skfb.ly/6uYCH) by Jonathon.Lai is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+- [sniper rifle](https://sketchfab.com/3d-models/sci-fi-sniper-rifle-free-2d1bef3aa9ae47c5aee26cc3f032ab31)
+
+## cursor
+- [codepen](https://codepen.io/theseventh/pen/LYVqMYb)

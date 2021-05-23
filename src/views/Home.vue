@@ -1,5 +1,4 @@
 <template>
-  <!-- <canvas id="c"></canvas> -->
   <canvas id="c" :class="{ invisible: loadingThree, showAnimation: !loadingThree }"></canvas>
   <div class="wrap" v-if="loadingThree">
     <div class="bg">
@@ -18,7 +17,7 @@
       @onResetPickImage="onResetPickImage"
     />
   </transition>
-  <ScrollNav @onClickNavMenu="handleClickNavMenu"/>
+  <ScrollNav @onClickNavMenu="handleClickNavMenu" :currMovieGenre="currMovieGenre"/>
 	<section v-if="!isVisible" :class="{ invisible: loadingThree, showAnimation: !loadingThree }" class="example example--1">
     <span class="scroll-icon">
       <span class="scroll-icon__wheel-outer">
@@ -53,6 +52,7 @@ export default {
     const isVisible = ref(false)
     const loadingThree = ref(true)
     const picked_movie_id = ref(0)
+		const currMovieGenre = ref('sci_fi')
     const handleClickNavMenu = (genre) => {
       main.onScrollEvent(genre)
     }
@@ -60,9 +60,14 @@ export default {
       main.resetPickImage()
     }
 
+		// three -> change data in store 
     watch(isVisible, () => {
       store.dispatch('movies/pickMovie', picked_movie_id.value)
     })
+
+		watch(currMovieGenre, () => {
+			store.dispatch('movies/changeCurrMovieGenre', currMovieGenre.value)
+		})
 
     ////////////////////////////////////
     // DRF
@@ -77,7 +82,7 @@ export default {
     onMounted(() => {
       // logic update needed -> to fully asynchrounous 
       setTimeout(() => {
-        main(moviesObj.value, isVisible, loadingThree, picked_movie_id)
+        main(moviesObj.value, isVisible, loadingThree, picked_movie_id, currMovieGenre)
       }, 1000)
       })
 
@@ -85,6 +90,7 @@ export default {
       isVisible, 
       loadingThree,
       picked_movie_id,
+			currMovieGenre,
       handleClickNavMenu,
       onResetPickImage,
       moviesObj
@@ -101,7 +107,7 @@ export default {
   width: 100%;
   left: 0;
   top: 0;
-  z-index: 0;
+  z-index: 1;
 }
 
 .invisible {

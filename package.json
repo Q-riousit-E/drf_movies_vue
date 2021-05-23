@@ -11,6 +11,7 @@
     "@vueuse/integrations": "^4.11.0",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
+    "d3": "^6.7.0",
     "freezeframe": "^5.0.2",
     "gsap": "^3.6.1",
     "lodash": "^4.17.21",

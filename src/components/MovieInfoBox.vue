@@ -1,12 +1,10 @@
 <template>
   <div class="movie-info-box">
-    <div id="closeGifContainer">
-      <img id="closeGif" src="delete.gif" class="freezeframe" @click="onResetPickImage">
-    </div>
-    <p>Movie id: {{ picked_movie.id }}</p>
-    <p>Movie title: {{ picked_movie.title }}</p>
+    <h1>Movie title: {{ picked_movie.title }}</h1>
     <p>Movie ratings: {{ picked_movie.vote_average }}</p>
     <a href="#">Movie Details {{ picked_movie.id }}</a>
+    <!-- <p>trailer path: {{ picked_movie.trailer_path }}</p> -->
+  	<iframe v-if="true" width="420" height="315" :src="picked_movie.trailer_path" frameborder="0"></iframe>
   </div>
 </template>
 
@@ -14,7 +12,7 @@
 import { computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
 
-import Freezeframe from 'freezeframe'
+// import { RadarChart } from '../scripts/radarChart.js'
 
 export default {
   name: 'MovieInfoBox',
@@ -28,13 +26,6 @@ export default {
       emit('onResetPickImage')
     }
 
-    // close button animation
-    onMounted(() => {
-      const closeGif = new Freezeframe('#closeGif', {
-        trigger: 'hover'
-      })
-    })
-
     return {
       onResetPickImage,
       picked_movie
@@ -45,7 +36,7 @@ export default {
 
 <style>
 .movie-info-box {
-  background: rgb(255, 255, 255);
+  background: rgb(255, 255, 255, 0.4);
   position: fixed;
   z-index: 50;
   left: 50%;
@@ -54,26 +45,17 @@ export default {
   /* font-size: 50px; */
   font-family: Helvetica, Arial, "sans-serif";
   width: 50vw;
-  /* height: 60vh; */
+  height: 60vh;
   text-align: center;
   color: rgb(31, 31, 31);
   text-decoration: none;
   line-height: 50px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-radius: 10px;
+  /* box-shadow: ; */
 }
 
-.ff-canvas,
-.ff-image {
-  height: 100%;
-}
-
-#closeGifContainer {
-  width: 3vw;
-  height: 3vh;
-  cursor: pointer;
-  align-self: flex-end;
-}
 </style>
