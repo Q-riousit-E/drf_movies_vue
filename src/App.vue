@@ -1,5 +1,5 @@
 <template>
-  <div id="nav">
+  <div id="nav" v-if="mainNavShow">
     <router-link :to="{ name: 'Home' }">Home</router-link> |
     <router-link :to="{ name: 'Articles' }">Articles</router-link> |
     <router-link :to="{ name: 'Signup' }">Signup</router-link> |
@@ -7,7 +7,7 @@
     <router-link :to="{ name: 'Logout' }">Logout</router-link> |
     <router-link :to="{ name: 'Testing' }">Testing</router-link> |
   </div>
-  <router-view/>
+  <router-view @showMainNav="showMainNav"/>
 
   <!-- MUST FIX: stop three from reloading  -->
   <!-- <router-view v-slot="Home">
@@ -19,13 +19,20 @@
   </router-view> -->
 </template>
 <script>
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 import gsap from 'gsap'
 import Home from '@/views/Home.vue'
 
 export default defineComponent({
-  // custom cursor
   setup() {
+    // hidden navbar for first load
+    const mainNavShow = ref(false)
+    const showMainNav = () => {
+			console.log('showmainnav')
+      mainNavShow.value = true
+    }
+
+    // custom cursor
     function lerp(start, end, amount) {
       return (1-amount)*start+amount*end
     }
@@ -98,6 +105,7 @@ export default defineComponent({
     window.addEventListener('mouseup', mouseup, false);
 
     return {
+      mainNavShow, showMainNav,
       Home
     }
   },
@@ -106,15 +114,21 @@ export default defineComponent({
 
 <style>
 * {
-  outline: none;
-  /* -webkit-tap-highlight-color: transparent; */
   cursor: none;
   /* user-select: none; */
   -webkit-user-drag: none;
 }
 
-body {
-  background: rgb(30 40 42);
+p {
+  margin: 0;
+}
+
+body, html {
+  background: rgb(30, 40, 42);
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
 #app {
@@ -122,7 +136,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: #181818;
 }
 
 #nav {

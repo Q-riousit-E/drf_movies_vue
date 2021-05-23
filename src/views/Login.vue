@@ -5,7 +5,7 @@
   <div v-else class="wrapper fadeInDown" >
     <div id="formContent">
       <!-- Tabs Titles -->
-      <h2 class="active"> Sign In </h2>
+      <h2 class=" sign-in active"> Sign In </h2>
 
       <!-- Login Form -->
       <form @submit="submitLogin">
@@ -54,7 +54,7 @@ export default {
 }
 </script>
 
-<style >
+<style scoped>
 @import url('https://fonts.googleapis.com/css?family=Poppins');
 
 /* BASIC */
@@ -70,7 +70,7 @@ a {
   font-weight: 400;
 }
 
-h2 {
+.sign-in {
   text-align: center;
   font-size: 16px;
   font-weight: 600;

@@ -1,8 +1,9 @@
 <template>
-  <div class="rating-container mt-4">
+  <div class="rating-container">
     <div class="start-rating-container">
       <img src="tmdb_logo.jpg" alt="" class="tmdb-logo mb-3">
       <div class="Stars" :style="`--rating: ${rating};`" aria-label="Rating of this product is 2.3 out of 5."></div>
+      <p>{{ rating }}</p>
     </div>
   </div>
 </template>

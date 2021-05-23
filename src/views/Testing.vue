@@ -1,6 +1,6 @@
 <template>
   <MovieInfoBox @onResetPickImage="onResetPickImage" v-if="true"/>
-  <div class="wrap" v-if="false">
+  <!-- <div class="wrap" v-if="false">
     <div class="bg">
       <div class="loading">
         <span class="title">loading</span>
@@ -8,16 +8,25 @@
       </div>
     </div>
   </div>
-	<iframe v-if="false" width="420" height="315" src="https://www.youtube.com/embed/ul7wcneBjOI" frameborder="0"></iframe>
+	<iframe v-if="false" width="420" height="315" src="https://www.youtube.com/embed/ul7wcneBjOI" frameborder="0"></iframe> -->
+	<!-- Radar Chart -->
+	<!-- <div>
+		<RadarChart />
+		<ZingChart />
+	</div> -->
 </template>
 
 <script>
 import MovieInfoBox from '@/components/MovieInfoBox.vue'
+import RadarChart from '@/components/RadarChart.vue'
+import ZingChart from '@/components/ZingChart.vue'
 
 export default {
   name: 'Testing',
   components: {
     MovieInfoBox,
+		RadarChart,
+		ZingChart
   },
   setup() {
     const onResetPickImage = () => {
@@ -31,7 +40,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 @-webkit-keyframes title {
 	 0% {
 		 opacity: 0;

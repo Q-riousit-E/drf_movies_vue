@@ -6,16 +6,16 @@
   <div class="wrap" v-if="loadingThree">
     <div class="bg">
       <div class="loading">
-        <span class="title">loading...</span>
-        <span class="text">최고의 영화 준비중...</span>
+        <span class="title">loading...{{Math.floor(progressCount)}}%</span>
+        <span class="text">loading...{{Math.floor(progressCount)}}%</span>
       </div>
     </div>
   </div>
 
 	<!-- Progress Bar -->
-  <div id="loading" v-if="loadingThree">
-    <div class="progress"><div class="progressbar"></div></div>
-  </div>
+	<transition name="fade" mode="out-in">
+		<div class="progress-bar" v-if="loadingThree"></div>
+	</transition>
 
 	<!-- Movie Info Box -->
   <transition name="switch">
@@ -26,8 +26,8 @@
   </transition>
 
 	<!-- MUST FIX TRANSITION -->
-	<transition name="fade">
-		<ScrollNav @onClickNavMenu="handleClickNavMenu" :currMovieGenre="currMovieGenre" v-show="!isVisible" />
+	<transition name="fade" mode="out-in">
+		<ScrollNav @onClickNavMenu="handleClickNavMenu" :currMovieGenre="currMovieGenre" v-show="!isVisible && !loadingThree" />
 	</transition>
 
 	<!-- Scroll Icon -->
@@ -37,7 +37,7 @@
         <span class="scroll-icon__wheel-inner"></span>
       </span>
     </span>
-    <h2>Scroll</h2>
+    <h2 class="scroll-text">Scroll</h2>
   </section>
 </template>
 
@@ -55,10 +55,24 @@ export default {
     ScrollNav,
     MovieInfoBox
   },
-  setup() {
+	emits: ['showMainNav'],
+  setup(props, { emit }) {
     ///////////////////////////////////
     // init
+		console.log(props)
     const store = useStore()
+
+		///////////////////////////////////
+		// Progress Bar
+		const progressCount = ref(0)
+
+		watch(progressCount, () => {
+			const bar = document.querySelector('.progress-bar')
+			bar.style.width = progressCount.value + '%'
+			if (progressCount.value === 100) {
+				emit('showMainNav')
+			}
+		})
 
     ///////////////////////////////////
     // Three 
@@ -95,11 +109,12 @@ export default {
     onMounted(() => {
       // logic update needed -> to fully asynchrounous 
       setTimeout(() => {
-        main(moviesObj.value, isVisible, loadingThree, picked_movie_id, currMovieGenre)
+        main(progressCount, moviesObj.value, isVisible, loadingThree, picked_movie_id, currMovieGenre)
       }, 1000)
       })
 
     return {
+			progressCount,
       isVisible, 
       loadingThree,
       picked_movie_id,
@@ -113,6 +128,7 @@ export default {
 </script>
 
 <style scoped>
+/* Three js */
 #c {
   position: fixed;
   display: block;
@@ -128,7 +144,7 @@ export default {
 }
 
 .showAnimation {
-  animation: fadeIn 4s ease-in
+  animation: fadeIn 6s ease-in
 }
 
 @keyframes fadeIn {
@@ -140,30 +156,18 @@ export default {
   }
 }
 
-#loading {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 3;
-}
-#loading .progress {
-    margin: 1.5em;
-    border: 1px solid white;
-    width: 50vw;
-}
-#loading .progressbar {
-    margin: 2px;
-    background: white;
-    height: 1em;
-    transform-origin: top left;
-    transform: scaleX(0);
+.dg {
+	position: relative;
+	z-index: 4;
 }
 
+/* Progress Bar */
+.progress-bar {
+	position: absolute;
+	top: 50%;
+	height: 2px;
+	background: rgb(255, 255, 255);
+}
 
 /* Trasitions */
 .switch-enter-from,
@@ -185,9 +189,14 @@ export default {
 	opacity: 0;
 }
 
+.fade-enter-to,
+.fade-leave-from {
+	opacity: 1;
+}
+
 .fade-enter-active,
 .fade-leave-active {
-	transition: all 1.3 ease;
+	transition: opacity 0.6s ease;
 }
 
 /* Loading Text */
@@ -251,7 +260,7 @@ export default {
 		 opacity: 0;
 	}
 }
- @-webkit-keyframes bg {
+ /* @-webkit-keyframes bg {
    0% {
 		 background-color: black;
    }
@@ -278,7 +287,7 @@ export default {
 	 75% {
 		 background-color: #734a10;
 	}
-}
+} */
  @-webkit-keyframes blink {
 	 0% {
 		 opacity: 0;
@@ -310,7 +319,7 @@ export default {
 	}
 	 45% {
 		 opacity: 1;
-		 right: 80px;
+		 right: 100px;
 	}
 	 50% {
 		 opacity: 0;
@@ -346,7 +355,7 @@ export default {
 	}
 	 95% {
 		 opacity: 1;
-		 right: 80px;
+		 right: 100px;
 	}
 	 96% {
 		 right: -21px;
@@ -387,7 +396,7 @@ export default {
 	}
 	 45% {
 		 opacity: 1;
-		 right: 80px;
+		 right: 100px;
 	}
 	 50% {
 		 opacity: 0;
@@ -423,7 +432,7 @@ export default {
 	}
 	 95% {
 		 opacity: 1;
-		 right: 80px;
+		 right: 100px;
 	}
 	 96% {
 		 right: -21px;
@@ -435,20 +444,20 @@ export default {
 }
  .wrap {
 	 font-family: Purista, sans-serif, arial;
-	 background: rgb(73, 73, 73);
+	 /* background: rgb(73, 73, 73); */
 	 color: #eaf7ff;
 	 position: absolute;
-	 top: 46%;
-	 left: 50%;
-	 margin-left: -80px;
+	 top: 50%;
+	 left: 51%;
+	 margin-left: -100px;
 	 margin-top: -40px;
 }
- .bg {
+ /* .bg {
 	 padding: 30px 30px 30px 0;
 	 background: #306f99;
    animation: bg 3s linear infinite;
    box-shadow: inset 0 0 45px 30px rgb(30 40 42);
-}
+} */
 .loading {
 	 position: relative;
 	 text-align: right;
@@ -475,13 +484,13 @@ export default {
 	 width: 16px;
    background: #eaf7ff;
    box-shadow: 0 0 15px #bce4ff;
-   animation: blink 4.4s infinite;
+   animation: blink 3.0s infinite;
 }
  .loading span.title {
-   animation: title 4.4s linear infinite;
+   animation: title 3.0s linear infinite;
 }
  .loading span.text {
-   animation: title 4.4s linear 2.2s infinite;
+   animation: title 3.0s linear 1.5s infinite;
 	 opacity: 0;
 }
 
@@ -529,11 +538,11 @@ export default {
   animation: scroll_1 2.75s ease-in-out infinite;
 }
 
-h2 {
+.scroll-text {
 	margin: 1vh;
   color: white;
   font-family: Roboto, sans-serif;
-  font-weight: 100;
+  font-size: 1.5rem;
 	z-index: 10;
 }
 

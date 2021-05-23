@@ -16,15 +16,9 @@ import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
 import gsap from 'gsap'
 
 // data to be received from vue
-function main(movieObjs, isVisible, loadingThree, picked_movie_id, currMovieGenre) {
+function main(progressCount, movieObjs, isVisible, loadingThree, picked_movie_id, currMovieGenre) {
   // // test
   // console.log(movieObjs)
-
-  ////////////////////////////////////////////////////////////////////////
-  //// Communication with Vue
-  // html querying
-  const loadingElem = document.querySelector('#loading')
-  const progressBarElem = loadingElem.querySelector('.progressbar')
 
   ////////////////////////////////////////////////////////////////////////
   //// Setup
@@ -164,8 +158,9 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id, currMovieGenr
   scene.add(movieGroup)
  
   function makeInstance(geometry, genre, movieObj, idx) {
-    // w92 for faster loading for testing -> change to w-500 for final result
-    const material = new THREE.MeshStandardMaterial({map: loader.load(movieObj.poster_path.replace('/original/', '/w92/'))})
+    // w92 for faster loading for testing -> change to w500 for final result
+    const material = new THREE.MeshStandardMaterial({map: loader.load(movieObj.poster_path.replace('/original/', '/w500/'))})
+    // const material = new THREE.MeshStandardMaterial({map: loader.load(movieObj.poster_path)})
     const movie = new THREE.Mesh(geometry, material);
     const numMovies = movieObjs[genre].length
 		const rad = idx * (2*Math.PI / numMovies)
@@ -440,8 +435,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id, currMovieGenr
   /////////////////////////////////////////////////////////////////////////////////////
   //// Loading
   loadManager.onProgress = (urlOfLastItemLoaded, itemsLoaded, itemsTotal) => {
-    const progress = itemsLoaded / itemsTotal
-    progressBarElem.style.transform = `scaleX(${progress})`
+    progressCount.value = itemsLoaded / itemsTotal * 100
   }
 
   loadManager.onLoad = () => {
@@ -451,7 +445,7 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id, currMovieGenr
   /////////////////////////////////////////////////////////////////////////////////////
   //// Lights
   // 0. Directional Light for whole scene
-  const light0 = new THREE.DirectionalLight( 'rgb(245, 246, 250)', 1.1 )
+  const light0 = new THREE.DirectionalLight( 'rgb(245, 246, 250)', 0.85 )
   light0.position.set(0, 10, 0)
   light0.target.position.set(25, 0, radius)
   scene.add( light0 )
@@ -706,9 +700,9 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id, currMovieGenr
       case 3:
         currMovieGenre.value = 'action'
         gsap.to(currBgc, { 
-          r: 126,
-          g: 214,
-          b: 223,
+          r: 127,
+          g: 143,
+          b: 166,
           opacity: 1,
           onUpdate: function () {
             renderer.setClearColor(new THREE.Color(`rgb(${Math.floor(currBgc.r)}, ${Math.floor(currBgc.g)}, ${Math.floor(currBgc.b)})`), currBgc.opacity)
@@ -733,6 +727,9 @@ function main(movieObjs, isVisible, loadingThree, picked_movie_id, currMovieGenr
           },
           onComplete: function () {
             horrorFlag = true
+            setTimeout(() => {
+              horrorFlag = false
+            }, 7000)
           }
         })
         break

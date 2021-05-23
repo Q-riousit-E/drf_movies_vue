@@ -1,9 +1,9 @@
 <template>
   <nav>
     <a class="nav-item is-active" active-color="orange" @click="onClickNavMenu('sci_fi')" data-genre="sci_fi">Sci-fi</a>
-    <a class="nav-item" active-color="green" @click="onClickNavMenu('romance')" data-genre="romance">Romance</a>
-    <a class="nav-item" active-color="blue" @click="onClickNavMenu('animation')" data-genre="animation">Animation</a>
-    <a class="nav-item" active-color="red" @click="onClickNavMenu('action')" data-genre="action">Action</a>
+    <a class="nav-item" active-color="orangered" @click="onClickNavMenu('romance')" data-genre="romance">Romance</a>
+    <a class="nav-item" active-color="greenyellow" @click="onClickNavMenu('animation')" data-genre="animation">Animation</a>
+    <a class="nav-item" active-color="royalblue" @click="onClickNavMenu('action')" data-genre="action">Action</a>
     <a class="nav-item" active-color="rebeccapurple" @click="onClickNavMenu('horror')" data-genre="horror">Horror</a>
     <span class="nav-indicator"></span>
   </nav>
@@ -72,6 +72,10 @@ export default {
 </script>
 
 <style scoped>
+* {
+	 box-sizing: border-box;
+}
+
 nav {
   top: 11%;
   left: 50%;
@@ -81,11 +85,7 @@ nav {
   display: flex;
   z-index: 3;
   box-shadow: 0 10px 40px rgba(159, 162, 177, .8);
-	border-radius: 40px;
-}
-
-* {
-	 box-sizing: border-box;
+	border-radius: 10px;
 }
 
  .nav-item {
@@ -96,7 +96,7 @@ nav {
 	 margin: 0 6px;
 	 z-index: 1;
 	 font-family: 'DM Sans', sans-serif;
-	 font-weight: 500;
+	 font-weight: 700;
 	 position: relative;
 }
  .nav-item:before {
@@ -116,7 +116,7 @@ nav {
 	 bottom: 0;
 }
  .nav-item:not(.is-active):hover {
-	 color: #333;
+	 color: rgb(255, 255, 255);
 }
  .nav-indicator {
 	 position: absolute;
