@@ -19,161 +19,190 @@
 </template>
 
 <script>
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
+import { useStore } from 'vuex'
+
 export default {
   name: 'MyRatingCharts',
   setup() {
+    const store = useStore()
+
+    // MUST DO : get rating data from db
+
     onMounted(() => {
       const chart1Id = 'chart1';
       const chart2Id = 'chart2';
-
-      //// Chart Data
-      const numOfRatingsPerScore = [100, 200, 300, 200, 500, 400, 300, 250, 500, 600]
-      //// CHART CONFIG
-      // Chart 1
-      const chart1Data = {
-        type: 'bar',
-        plot: {
-          animation: {
-            effect: 4,
-            sequence:1,
-            speed: 5000
-          }
-        },
-        globals: {
-          fontFamily: 'Poppins'
-        },
-        backgroundColor: 'transparent',
-        scaleX: {
-          // labels: ['0.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5', '5'],
-          labels: ['', '★', '', '★★', '', '★★★', '', '★★★★', '', '★★★★★'],
-          tick: {
-            visible: false
-          }
-        },
-        scaleY: {
-          lineWidth: 0,
-          tick: {
-            visible: false
-          },
-          guide: {
-            lineStyle: 'solid',
-            lineColor: 'var(--lightGray)'
-          }
-        },
-        plotarea: {
-          margin: 'dynamic'
-        },
-        series: [
-          {
-            values: numOfRatingsPerScore,
-            barColor: 'var(--yellow)',
-            lineWidth: 5,
-            // 'background-color': "#6666FF #FF0066",
-            'background-color': "var(--yellow)",
-            alpha: 0.8,
-            marker: {
-              type: 'star5',
-              size: 4
-            }
-          }
+      setTimeout(() => {
+        //// Chart Data
+        const simpleRatingData = store.state.movies.picked_movie.simple_rating_counts
+        console.log(simpleRatingData)
+        const numOfRatingsPerScore = [
+          simpleRatingData['0.5'],
+          simpleRatingData['1.0'],
+          simpleRatingData['1.5'],
+          simpleRatingData['2.0'],
+          simpleRatingData['2.5'],
+          simpleRatingData['3.0'],
+          simpleRatingData['3.5'],
+          simpleRatingData['4.0'],
+          simpleRatingData['4.5'],
+          simpleRatingData['5.0'],
         ]
-      }
-      // Chart 2
-      const chart2Data = {
-        type: 'radar',
-        plot: {
-          aspect: 'area',
-          animation: {
-            effect: 3,
-            sequence: 1,
-            speed: 5000
+        const detailedRatingData = store.state.movies.picked_movie.detailed_ratings_average
+        const detailedRatingAverageScores = [
+          detailedRatingData.entertainment_value_average,
+          detailedRatingData.plot_average,
+          detailedRatingData.characters_average,
+          detailedRatingData.cinematography_average,
+          detailedRatingData.originality_average,
+          detailedRatingData.music_score_average,
+        ]
+  
+        //// CHART CONFIG
+        // Chart 1
+        const chart1Data = {
+          type: 'bar',
+          plot: {
+            animation: {
+              effect: 4,
+              sequence:1,
+              speed: 10000
+            },
+            barWidth: '0.75rem'
           },
-          'value-box': {
-            'font-family': "Georgia",
-            'font-size': 12,
-            'font-weight': "bold",
-            'font-color': 'white',
-            'offset-x': 0,
-            'offset-y': -15,
+          globals: {
+            fontFamily: 'Poppins'
           },
-        },
-        scaleV: {
-          visible: true,
-          'min-value': 0,
-          'max-value': 5,
-          step: 1,
-          items: {
-            fontColor: '#607D8B',
-          }
-        },
-        scaleK: {
-          labels: [
-            'Originality',
-            'Creativity',
-            'Characters',
-            'Cinematography',
-            'Plot',
-            'Music Score',
-          ],
-          item: {
-            fontColor: '#607D8B',
-            backgroundColor: "white",
-            borderColor: "#aeaeae",
-            borderWidth: 1,
-            padding: '5 10',
-            borderRadius: 10
-          },
-          refLine: {
-            lineColor: '#c10000'
-          },
-          tick: {
-            lineColor: '#59869c',
-            lineWidth: 2,
-            lineStyle: 'dotted',
-            size: 15
-          },
-          guide: {
-            lineColor: "#607D8B",
-            lineStyle: 'solid',
-            alpha: 0.4,
-            backgroundColor: "#c5c5c5 #718eb4"
-          }
-        },
-        backgroundColor: 'transparent',
-        plotarea: {
-          margin: 'dynamic'
-        },
-        series: [{
-            values: [1, 3, 3, 4, 3, 2],
-            // values: [1, 3, 3, 4, 3, 2, 1, 3, 3, 4, 3, 2],
-            text: 'farm',
-            marker: {
-              type: 'star5',
-              size: 4
+          backgroundColor: 'transparent',
+          scaleX: {
+            // labels: ['0.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5', '5'],
+            labels: ['', '★', '', '★★', '', '★★★', '', '★★★★', '', '★★★★★'],
+            tick: {
+              visible: false
             }
           },
-        ]
-      };
-
-// RENDER CHARTS
-      // -----------------------------
-
-      // Chart 1
-      zingchart.render({
-        id: chart1Id,
-        data : chart1Data,
-        height: 300,
-        width: '100%'
-      });
-
-      // Chart 2
-      zingchart.render({
-        id: chart2Id,
-        data : chart2Data,
-        height: 300,
-        width: '100%'
-      });
+          scaleY: {
+            lineWidth: 0,
+            tick: {
+              visible: false
+            },
+            guide: {
+              lineStyle: 'solid',
+              lineColor: 'var(--lightGray)'
+            }
+          },
+          plotarea: {
+            margin: 'dynamic'
+          },
+          series: [
+            {
+              values: numOfRatingsPerScore,
+              barColor: 'var(--yellow)',
+              lineWidth: 1,
+              borderWidth: 1.2,
+              // 'background-color': "#6666FF #FF0066",
+              'background-color': "var(--yellow)",
+              alpha: 0.8,
+              marker: {
+                type: 'star5',
+                size: 4
+              }
+            }
+          ]
+        }
+        // Chart 2
+        const chart2Data = {
+          type: 'radar',
+          plot: {
+            aspect: 'area',
+            animation: {
+              effect: 3,
+              sequence: 1,
+              speed: 10000
+            },
+            'value-box': {
+              'font-family': "Georgia",
+              'font-size': 12,
+              'font-weight': "bold",
+              'font-color': 'white',
+              'offset-x': 0,
+              'offset-y': -10,
+            },
+          },
+          scaleV: {
+            visible: true,
+            'min-value': 0,
+            'max-value': 5,
+            step: 1,
+            items: {
+              fontColor: '#607D8B',
+            }
+          },
+          scaleK: {
+            labels: [
+              'Entertainment_value',
+              'Plot',
+              'Characters',
+              'Cinematography',
+              'Originality',
+              'Music Score',
+            ],
+            item: {
+              fontColor: '#607D8B',
+              backgroundColor: "white",
+              borderColor: "#aeaeae",
+              borderWidth: 1,
+              padding: '5 10',
+              borderRadius: 10
+            },
+            refLine: {
+              lineColor: '#c10000'
+            },
+            tick: {
+              lineColor: '#59869c',
+              lineWidth: 2,
+              lineStyle: 'dotted',
+              size: 15
+            },
+            guide: {
+              lineColor: "#607D8B",
+              lineStyle: 'solid',
+              alpha: 0.4,
+              backgroundColor: "#c5c5c5 #718eb4"
+            }
+          },
+          backgroundColor: 'transparent',
+          plotarea: {
+            margin: 'dynamic'
+          },
+          series: [{
+              values: detailedRatingAverageScores,
+              text: 'farm',
+              marker: {
+                type: 'star5',
+                size: 4
+              }
+            },
+          ]
+        };
+  
+        //// RENDER CHARTS
+        // Chart 1
+        zingchart.render({
+          id: chart1Id,
+          data : chart1Data,
+          height: 300,
+          width: '100%'
+        });
+  
+        // Chart 2
+        zingchart.render({
+          id: chart2Id,
+          data : chart2Data,
+          height: 300,
+          width: '100%'
+        });
+      }, 1500)
     })
   }
 }

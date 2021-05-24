@@ -729,7 +729,7 @@ function main(progressCount, movieObjs, isVisible, loadingThree, picked_movie_id
             horrorFlag = true
             setTimeout(() => {
               horrorFlag = false
-            }, 7000)
+            }, 15000)
           }
         })
         break

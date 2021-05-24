@@ -66,6 +66,9 @@
 <script>
 import { computed, watch } from 'vue'
 import { useStore } from 'vuex'
+
+import axios from 'axios'
+
 export default {
   name: 'MainNav',
   setup() {
@@ -80,7 +83,94 @@ export default {
     return {
       decodedToken
     }
+  },
+  mounted() {
+    // Grab elements
+    const searchInput = document.querySelector("#search-input");
+    const myPopover = document.querySelector(".my-popover");
+    const searchLabel = document.querySelector(".search-label");
+    const xIconDiv = document.querySelector(".x-icon");
+    const spinnerIcondiv = document.querySelector(".spinner-icon");
 
+    // clicking searchLabel focuses searchInput
+    searchLabel.addEventListener("click", () => {
+      searchInput.focus();
+    });
+
+    // focus and focusout events on searchInput
+    searchInput.addEventListener("focus", () => {
+      if (searchInput.value) {
+        myPopover.classList.add("show-popover");
+        myPopover.classList.remove("invisible");
+        searchInput.classList.add("input-with-popover");
+      }
+    });
+    searchInput.addEventListener("focusout", () => {
+      // use setTimeOut so a tag redirecting works for searched items
+      setTimeout(() => {
+        myPopover.classList.remove("show-popover");
+        myPopover.classList.add("invisible");
+        searchInput.classList.remove("input-with-popover");
+      }, 100);
+    });
+
+    // x-icon click event
+    xIconDiv.addEventListener("click", () => {
+      searchInput.value = "";
+      myPopover.classList.remove("show-popover");
+      myPopover.classList.add("invisible");
+      searchInput.classList.remove("input-with-popover");
+      xIconDiv.classList.add("invisible");
+      spinnerIcondiv.classList.add("invisible");
+      searchLabel.classList.remove("invisible");
+    })
+
+    // initiate search via ajax (wait 0.5s until user finishes typing)
+    let timeout = null;
+    searchInput.addEventListener("keyup", e => {
+      // start spinner icon and remove search icon
+      xIconDiv.classList.add("invisible");
+      spinnerIcondiv.classList.remove("invisible");
+      searchLabel.classList.add("invisible");
+      
+      // clear timeout if change within 0.5s
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        // delete all previous data in popover
+        [...document.querySelectorAll(".popover-items")].forEach(item => {
+          item.remove();
+        });
+
+        // if search_word != empty -> request search
+        if (e.target.value) {
+          searchRequest(e.target.value);
+        } else {
+          myPopover.classList.remove("show-popover");
+          myPopover.classList.add("invisible");
+          searchInput.classList.remove("input-with-popover");
+          xIconDiv.classList.add("invisible");
+          spinnerIcondiv.classList.add("invisible");
+          searchLabel.classList.remove("invisible");
+        }
+      }, 500);
+    })
+
+    // axios request with the query
+    function searchRequest(query) {
+      console.log("seach for: ", query)
+      axios({
+        method: 'get',
+        url: "http://localhost:8000/api/v1/movies/search/",
+        params: {'q': query},
+      })
+        .then((res) => {
+          console.log(res)
+          showSearchResults(res)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    }
   }
 }
 </script>
@@ -220,6 +310,7 @@ export default {
 /* accounts */
 .profile-dropdown {
   min-width: 100%;
+  z-index: 60;
 }
 
 .profile-img {

@@ -17,8 +17,8 @@
 
     <!-- Cast / Crew -->
     <h5>Cast / Crew</h5>
-    <p><span class="role-span">Director : </span> Christopher Nolan</p>
-    <p><span class="role-span">Cast : </span> Tom Cruise, Lebron James, Harry Potter</p> 
+    <p><span class="role-span">Director : </span>{{ picked_movie.director_name || "N/A" }}</p>
+    <p><span class="role-span">Cast : </span>{{ (picked_movie.cast1_name ?  picked_movie.cast1_name : "N/A") + (picked_movie.cast2_name ? ", " : "") }}{{ (picked_movie.cast2_name ? picked_movie.cast2_name : "") + (picked_movie.cast3_name ? ", " : "") }}{{ picked_movie.cast3_name || "" }}</p> 
     <p><span class="role-span">Subscription : </span> Netflix</p> 
     
     <hr>
@@ -26,13 +26,20 @@
     <!-- Ratings -->
     <h5 class="mb-3">Ratings</h5>
     <MyRatingCharts />
+
+    <hr>
+
+    <!-- Reviews -->
+    <h5>Reviews</h5>
+    <ReviewCard v-for="(review, idx) in reviews" :key="idx" :review="review" />
   </div>
 </div>
 </template>
 
 <script>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
+import { useRoute } from 'vue-router'
 
 import StarRating from '@/components/StarRating.vue'
 import StarRatingSubmit from '@/components/StarRatingSubmit.vue'
@@ -40,20 +47,33 @@ import StarRatingSubmit from '@/components/StarRatingSubmit.vue'
 import ZingChart from '@/components/ZingChart.vue'
 import MyRatingCharts from '@/components/MyRatingCharts.vue'
 
+import ReviewCard from '@/components/ReviewCard.vue'
+
 export default {
   name: 'Movies',
   components: {
     StarRating,
     StarRatingSubmit,
     ZingChart,
-    MyRatingCharts
+    MyRatingCharts,
+    ReviewCard
   },
   setup() {
+    // dummy reviews for tesing
+    const reviews = ref(['this movie sucks', 'soso', 'best movie ever'])
     const store = useStore()
+    const route = useRoute()
+
+    const changePicked_movie = () => {
+      store.dispatch('movies/pickMovie', route.params.movie_id)
+    }
+    changePicked_movie()
+
     const picked_movie = computed(() => store.state.movies.picked_movie)
 
     return {
-      picked_movie
+      picked_movie,
+      reviews
     }
   }
 }
@@ -67,7 +87,7 @@ export default {
   /* background: rgb(255, 255, 255, 0.7); */
   background: rgb(0, 0, 0, 0.7);
   position: fixed;
-  z-index: 50;
+  /* z-index: 50; */
   /* font-size: 50px; */
   font-family: Helvetica, Arial, "sans-serif";
   width: 100vw;
@@ -79,7 +99,6 @@ export default {
   /* line-height: 50px; */
   text-align: left;
   overflow-x: hidden;
-  overflow-y: auto;
 }
 
 .movie-poster-div {
@@ -98,6 +117,7 @@ export default {
 .movie-general-info-div {
   width: 75vw;
   margin: 3vw 3vw 3vw 1vw;
+  overflow-y: auto;
 }
 
 .movie-ratings {

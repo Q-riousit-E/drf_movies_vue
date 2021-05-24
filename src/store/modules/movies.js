@@ -1,9 +1,12 @@
 import axios from 'axios'
 
+const moviesURL = 'http://localhost:8000/api/v1/movies/'
+
 const state = {
   moviesObj: null,
   picked_movie: null,
-  currMovieGenre: 'sci_fi'
+  currMovieGenre: 'sci_fi',
+  simpleRating: 0
 }
 
 const mutations = {
@@ -15,7 +18,12 @@ const mutations = {
   },
   SET_CURR_MOVIE_GENRE(state, currMovieGenre) {
     state.currMovieGenre = currMovieGenre
-  }
+  },
+
+  // MovieDetail.vue
+  SET_SIMPLE_RATING(state, rating) {
+    state.simpleRating = rating
+  },
 }
 
 const actions = {
@@ -36,10 +44,9 @@ const actions = {
     // send axios request to get picked movie details
     axios({
       method: 'get',
-      url: `http://localhost:8000/api/v1/movies/${picked_movie_id}/`
+      url: moviesURL + picked_movie_id + '/'
     })
     .then((res) => {
-      console.log(res)
       commit('SET_PICKED_MOVIE', res.data)
     })
     .catch((err) => {
@@ -48,6 +55,78 @@ const actions = {
   },
   changeCurrMovieGenre({ commit }, currMovieGenre) {
     commit('SET_CURR_MOVIE_GENRE', currMovieGenre)
+  },
+
+  // MovieDetail.vue
+  readCurrSimpleRating({ commit, rootState }, movie_id) {
+    axios({
+      method: 'get',
+      url: moviesURL + `${movie_id}/simple_rating/`,
+      headers: {
+        Authorization: 'JWT ' + rootState.auth.token
+      }
+    })
+      .then((res) => {
+        commit('SET_SIMPLE_RATING', res.data.rating)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  },
+  updateSimpleRating({ commit, rootState }, { rating, movie_id }) {
+    if (rootState.movies.simpleRating) { 
+      // PUT request if simple rating already exists
+      axios({
+        method: 'put',
+        url : moviesURL + `${movie_id}/simple_rating/`,
+        headers: {
+          Authorization: 'JWT ' + rootState.auth.token
+        },
+        data: {
+          rating
+        }
+      })
+        .then((res) => {
+          commit('SET_SIMPLE_RATING', res.data.rating)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    } else {
+      // POST request if not
+      axios({
+        method: 'post',
+        url : moviesURL + `${movie_id}/simple_rating/`,
+        headers: {
+          Authorization: 'JWT ' + rootState.auth.token
+        },
+        data: {
+          rating
+        }
+      })
+        .then((res) => {
+          commit('SET_SIMPLE_RATING', res.data.rating)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    }
+  },
+  deleteSimpleRating({ commit, rootState }, movie_id) {
+    console.log(movie_id)
+    axios({
+      method: 'delete',
+      url : moviesURL + `${movie_id}/simple_rating/`,
+      headers: {
+        Authorization: 'JWT ' + rootState.auth.token
+      } 
+    })
+      .then((res) => {
+        commit('SET_SIMPLE_RATING', 0)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
   }
 }
 
