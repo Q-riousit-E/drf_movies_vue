@@ -32,7 +32,6 @@ export default {
         }
       })
       handleIndicator(indicator, items, item)
-
     })
 
     // navbar click changes scroll in three
@@ -77,7 +76,7 @@ export default {
 }
 
 nav {
-  top: 11%;
+  top: 18%;
   left: 50%;
   transform: translate(-50%, -50%);
   opacity: 1;

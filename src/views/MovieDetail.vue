@@ -1,5 +1,9 @@
 <template>
 <div class="container-fluid movie-info-box d-flex flex-row p-0">
+  <div class="movie-poster-div">
+    <img class="movie-poster" :src="picked_movie.poster_path" alt="">
+    <StarRatingSubmit />
+  </div>
   <div class="movie-general-info-div">
     <h3>{{ picked_movie.title }}</h3>
     <p class="movie-year"><b>{{ picked_movie.release_date.substring(0, 4) }}</b></p>
@@ -7,53 +11,51 @@
     <span class="hashtags">sci-fi</span>
     <span class="hashtags">action</span>
     <!-- FIX NEEDED: cut sentence witha whole word -->
-    <p class="movie-overview mt-4">{{ picked_movie.overview.substring(0, 200) + '...' }}</p>
+    <p class="movie-overview mt-4">{{ picked_movie.overview.substring(0, 600) }}</p>
+    
     <hr>
+
+    <!-- Cast / Crew -->
+    <h5>Cast / Crew</h5>
     <p><span class="role-span">Director : </span> Christopher Nolan</p>
     <p><span class="role-span">Cast : </span> Tom Cruise, Lebron James, Harry Potter</p> 
     <p><span class="role-span">Subscription : </span> Netflix</p> 
+    
     <hr>
-    <router-link :to="{ name: 'MovieDetail', params: { movie_id: picked_movie.id }}" class="text-decoration-none"><span class="review-span">Details</span></router-link> 
-  </div>
-  <div class="movie-ratings d-flex flex-column">
-    <!-- <div class="d-flex justify-content-between"> -->
-    <div class="d-flex justify-content-center">
-      <!-- <StarRating :rating="picked_movie.vote_average"/> -->
-      <StarRating :rating="picked_movie.vote_average"/>
-    </div>
-    <ZingChart />
+
+    <!-- Ratings -->
+    <h5 class="mb-3">Ratings</h5>
+    <MyRatingCharts />
   </div>
 </div>
 </template>
 
 <script>
-import { computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useStore } from 'vuex'
 
 import StarRating from '@/components/StarRating.vue'
+import StarRatingSubmit from '@/components/StarRatingSubmit.vue'
+
 import ZingChart from '@/components/ZingChart.vue'
+import MyRatingCharts from '@/components/MyRatingCharts.vue'
 
 export default {
-  name: 'MovieInfoBox',
+  name: 'Movies',
   components: {
     StarRating,
-    ZingChart
+    StarRatingSubmit,
+    ZingChart,
+    MyRatingCharts
   },
-  setup(props, { emit }) {
-    // Vuex
+  setup() {
     const store = useStore()
     const picked_movie = computed(() => store.state.movies.picked_movie)
 
-    // Comm with three
-    const onResetPickImage = () => {
-      emit('onResetPickImage')
-    }
-
     return {
-      onResetPickImage,
       picked_movie
     }
-  },
+  }
 }
 </script>
 
@@ -66,28 +68,36 @@ export default {
   background: rgb(0, 0, 0, 0.7);
   position: fixed;
   z-index: 50;
-  left: 50%;
-  top: 50%;
-  transform: translate(-20%, -50%);
   /* font-size: 50px; */
   font-family: Helvetica, Arial, "sans-serif";
-  width: 50vw;
-  height: 50vh;
-  max-height: 60vh;
+  width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
   text-align: center;
   color: white;
   text-decoration: none;
   /* line-height: 50px; */
-  border-radius: 10px;
   text-align: left;
   overflow-x: hidden;
-  overflow-y: hidden;
+  overflow-y: auto;
+}
+
+.movie-poster-div {
+  margin: 3vw 1vw 3vw 3vw;
+  width: 20vw;
+  border-radius: 5px;
+}
+
+.movie-poster {
+  width: 100%;
+  height: 30vw;
+  max-height: 30vw;
 }
 
 
 .movie-general-info-div {
-  width: 30vw;
-  padding: 2vw;
+  width: 75vw;
+  margin: 3vw 3vw 3vw 1vw;
 }
 
 .movie-ratings {
@@ -116,8 +126,4 @@ export default {
 .review-span {
   color: cornflowerblue;
 }
-
-/* .review-a {
-  line-decoration: none;
-} */
 </style>

@@ -17,6 +17,7 @@
     "freezeframe": "^5.0.2",
     "gsap": "^3.6.1",
     "lodash": "^4.17.21",
+    "rater-js": "^1.0.1",
     "three": "^0.128.0",
     "universal-cookie": "^4.0.4",
     "vue": "^3.0.0",

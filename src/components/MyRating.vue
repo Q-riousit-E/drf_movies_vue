@@ -49,7 +49,7 @@ export default {
 :root {
   --star-size: 1rem;
   --star-color: #fff;
-  --star-background: rgb(14, 115, 149);
+  --my-star-background: #fc0;
 }
 
 .Stars {
@@ -67,7 +67,7 @@ export default {
     // font-weight: 400;    // for hollow stars
     font-weight: 900;
     letter-spacing: 3px;
-    background: linear-gradient(90deg, var(--star-background) var(--percent), var(--star-color) var(--percent));
+    background: linear-gradient(90deg, var(--my-star-background) var(--percent), var(--star-color) var(--percent));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }

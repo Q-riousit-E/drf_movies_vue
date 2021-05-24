@@ -9,10 +9,12 @@ const state = {
 const mutations = {
   SAVE_JWT(state, token) {
     state.token = token
-    state.decodedToken = jwt_decode(state.token)
+    console.log(token)
+    state.decodedToken = jwt_decode(token)
   },
   DELETE_JWT(state) {
     state.token = null
+    state.decodedToken = null
   }
 }
 
@@ -41,7 +43,7 @@ const actions = {
   })
     .then((res) => {
       console.log(res)
-      commit('SAVE_JWT', res.data)
+      commit('SAVE_JWT', res.data.token)
     })
     .catch((err) => {
       console.log(err)

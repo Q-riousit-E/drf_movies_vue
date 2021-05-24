@@ -1,12 +1,15 @@
 <template>
-  <div id="nav" v-if="mainNavShow">
+  <!-- <div id="nav" v-if="mainNavShow"> -->
+  <!-- <div id="nav" v-if="true">
     <router-link :to="{ name: 'Home' }">Home</router-link> |
     <router-link :to="{ name: 'Articles' }">Articles</router-link> |
     <router-link :to="{ name: 'Signup' }">Signup</router-link> |
     <router-link :to="{ name: 'Login' }">Login</router-link> | 
     <router-link :to="{ name: 'Logout' }">Logout</router-link> |
     <router-link :to="{ name: 'Testing' }">Testing</router-link> |
-  </div>
+  </div> -->
+  <MainNav />
+  <!-- FIX NEEDED: main nav not available when entered from not home -->
   <router-view @showMainNav="showMainNav"/>
 
   <!-- MUST FIX: stop three from reloading  -->
@@ -22,8 +25,12 @@
 import { defineComponent, ref } from 'vue'
 import gsap from 'gsap'
 import Home from '@/views/Home.vue'
+import MainNav from '@/components/MainNav.vue'
 
 export default defineComponent({
+  components: {
+    MainNav
+  },
   setup() {
     // hidden navbar for first load
     const mainNavShow = ref(false)
@@ -137,21 +144,8 @@ body, html {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #181818;
-}
-
-#nav {
-  padding: 30px;
-  position: relative;
-  z-index: 3;
-}
-
-#nav a {
-  font-weight: bold;
-  color: rgb(204, 204, 204);
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
+  height: 100%;
+  overflow: hidden;
 }
 
 /* Cursor */

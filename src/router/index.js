@@ -7,6 +7,7 @@ import Signup from '@/views/Signup.vue'
 import Login from '@/views/Login.vue'
 import Logout from '@/views/Logout.vue'
 import Testing from '@/views/Testing.vue'
+import MovieDetail from '@/views/MovieDetail.vue'
 
 const routes = [
   {
@@ -43,6 +44,11 @@ const routes = [
     path: '/testing',
     name: 'Testing',
     component: Testing
+  },
+  {
+    path: '/movies/:movie_id',
+    name: 'MovieDetail',
+    component: MovieDetail
   },
 ]
 

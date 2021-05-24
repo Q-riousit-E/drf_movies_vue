@@ -5,7 +5,7 @@
   <div v-else class="wrapper fadeInDown" >
     <div id="formContent">
       <!-- Tabs Titles -->
-      <h2 class=" sign-in active"> Sign In </h2>
+      <h2 class="sign-in active"> Sign In </h2>
 
       <!-- Login Form -->
       <form @submit="submitLogin">

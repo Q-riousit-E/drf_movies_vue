@@ -20,32 +20,37 @@ export default {
             sequence: 1,
             speed: 5000
           },
-          'value-box': {
-            'font-family': "Georgia",
-            'font-size':12,
-            'font-weight': "normal"
-          },
+          // 'value-box': {
+          //   'font-family': "Georgia",
+          //   'font-size': 12,
+          //   'font-weight': "bold",
+          //   'font-color': 'white',
+          //   'offset-x': 0,
+          //   'offset-y': -15,
+          // },
         },
         scaleV: {
           visible: true,
           'min-value': 0,
           'max-value': 5,
-          step: 1
+          step: 1,
+          items: {
+            fontColor: '#607D8B',
+          }
         },
         scaleK: {
           // aspect: 'circle',
           labels: [
             'Originality',
-            // 'Creativity',
-            'Plot',
+            'Creativity',
             // 'Pacing & Structure',
             'Characters',
             'Cinematography',
+            // 'Message Effectiveness',
+            'Plot',
             // 'Sound Quality',
             'Music Score',
-            // 'Entertainment Value',
-            'Dialogue',
-            // 'Message Effectiveness',
+            // 'Dialogue',
             // 'Call to Action'
           ],
           item: {
@@ -63,24 +68,26 @@ export default {
             lineColor: '#59869c',
             lineWidth: 2,
             lineStyle: 'dotted',
-            size: 20
+            size: 15
           },
           guide: {
             lineColor: "#607D8B",
             lineStyle: 'solid',
-            alpha: 0.3,
+            alpha: 0.4,
             backgroundColor: "#c5c5c5 #718eb4"
           }
         },
         backgroundColor: 'transparent',
-        // plotarea: {
-        //   backgroundColor: 'white'
-        // },
+        plotarea: {
+          margin: 'dynamic'
+        },
         series: [{
             values: [1, 3, 3, 4, 3, 2],
+            // values: [1, 3, 3, 4, 3, 2, 1, 3, 3, 4, 3, 2],
             text: 'farm',
             marker: {
-              type: 'star5'
+              type: 'star5',
+              size: 4
             }
           },
         ]
@@ -100,10 +107,10 @@ export default {
 <style scoped>
 .chart--container {
   position: absolute;
-  width: 30vw;
-  height: 30vh;
-  left: 24vw;
-  top: 15vh;
+  width: 25vw;
+  height: 25vh;
+  left: 27vw;
+  top: 20vh;
 }
 
 .zc-ref {
