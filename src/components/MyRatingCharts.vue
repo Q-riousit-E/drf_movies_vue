@@ -30,8 +30,6 @@ export default {
   setup() {
     const store = useStore()
 
-    // MUST DO : get rating data from db
-
     onMounted(() => {
       const chart1Id = 'chart1';
       const chart2Id = 'chart2';
@@ -151,7 +149,7 @@ export default {
           },
           scaleK: {
             labels: [
-              'Entertainment_value',
+              'Entertainment Value',
               'Plot',
               'Characters',
               'Cinematography',

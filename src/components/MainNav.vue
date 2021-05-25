@@ -14,13 +14,13 @@
           <!-- Search (center)-->
           <input type="checkbox" id="check">
           <div class="search-box">
-            <input id="search-input" type="text" placeholder="Search...">
+            <input id="search-input" type="text" placeholder="try #action..!">
             <label class="search-label" for="check"><i class="fas fa-search search-icon"></i></label>
             <div class="x-icon invisible"><i class="fas fa-times-circle"></i></div>
             <div class="spinner-icon invisible"><i class="fas fa-spinner fa-spin"></i></div>
           </div>
           <div class="my-popover invisible">
-            <hr class="popover-hr">
+            <!-- <hr class="popover-hr"> -->
             <SearchedMovie 
               v-for="(movie, idx) in searchedMovies" 
               :key="idx" 
@@ -29,7 +29,6 @@
           </div>
 
           <!-- accounts (right) -->
-          <!-- if logged in -->
           <div class="nav-accounts">
             <div v-if="decodedToken">
               <div class='d-flex'>
@@ -37,7 +36,6 @@
                   <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" type="button" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <!-- {% if user.profile_img %} -->
                     <!-- <img class="profile-img me-2" src="{{ user.profile_img.url }}" alt="{{ user.username }}'s profile image"> -->
-                    <!-- {% endif %} -->
                     {{ decodedToken.username }}
                   </a>
                   <ul class="dropdown-menu profile-dropdown" aria-labelledby="navbarDropdown">
@@ -79,7 +77,7 @@
 import AuthForm from '@/components/AuthForm.vue'
 import SearchedMovie from '@/components/SearchedMovie.vue'
 
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
 
 import axios from 'axios'
@@ -111,7 +109,6 @@ export default {
       authFormOn.value = false
     }
     const handleChangeToSignup = () => {
-      console.log('changed in mainnav')
       isLoginForm.value = false
     }
     const handleChangeToLogin = () => {
@@ -150,8 +147,9 @@ export default {
       searchInput.addEventListener("focusout", () => {
         // use setTimeOut so a tag redirecting works for searched items
         setTimeout(() => {
-          // myPopover.classList.remove("show-popover");
-          // myPopover.classList.add("invisible");
+          // for testing
+          myPopover.classList.remove("show-popover");
+          myPopover.classList.add("invisible");
           searchInput.classList.remove("input-with-popover");
         }, 100);
       });
@@ -180,9 +178,9 @@ export default {
         clearTimeout(timeout);
         timeout = setTimeout(() => {
           // delete all previous data in popover
-          [...document.querySelectorAll(".popover-items")].forEach(item => {
-            item.remove();
-          });
+          // [...document.querySelectorAll(".popover-items")].forEach(item => {
+          //   item.remove();
+          // });
 
           // if search_word != empty -> request search
           if (e.target.value) {
@@ -284,22 +282,24 @@ export default {
   position: absolute;
   left: 50%;
   width: 3vh;
-  height: 3vh;
+  height: 3.5vh;
   transform: translate(-50%);
   transition: 0.5s;
 }
 
 .search-box label {
   position: absolute;
+  top: 0.3rem;
   right: 0.5rem;
   width: 3vh;
-  height: 3vh;
+  height: 2.7vh;
   line-height: 3vh;
   border-radius: 50%;
   text-align: center;
   cursor: pointer;
-  background-color: white;
+  background-color: rgb(36, 36, 36);
   color: gray;
+  /* box-shadow: 0px 0px 22px 3px rgba(54,54,54,0.89); */
 }
 
 .search-box label:hover {
@@ -311,7 +311,7 @@ export default {
     color: gray;
   }
   50% {
-    color: black;
+    color: white;
   }
   100% {
     color: gray;
@@ -321,12 +321,15 @@ export default {
 .search-box input {
   width: 100%;
   height: 100%;
-  background-color: white;
-  border: none;
+  background-color: rgb(36, 36, 36);
+  border-bottom: none;
+  border-left: 1px rgba(255, 255, 255, 0.4) solid;
+  border-right: 1px rgba(255, 255, 255, 0.4) solid;
+  border-top: 1px rgba(255, 255, 255, 0.4) solid;
   border-radius: 0.7rem;
   outline: none;
   padding-left: 1rem;
-  color: black;
+  color: white;
   transition: 0.5s;
   transition-property: opacity;
   opacity: 0;
@@ -336,6 +339,7 @@ export default {
   position: absolute;
   color: gray;
   display: inline-block;
+  top: 0.3rem;
   right: 0.5rem;
   width: 3vh;
   height: 3vh;
@@ -351,6 +355,7 @@ export default {
   position: absolute;
   color: gray;
   display: inline-block;
+  top: 0.3rem;
   right: 0.5rem;
   width: 3vh;
   height: 3vh;
@@ -375,19 +380,24 @@ export default {
 }
 
 .my-popover {
+  display: block;
   position: absolute;
   left: 50%;
   transform: translate(-50%);
-  top: 2.7rem;
+  top: 2.4rem;
   width: 24vw;
   height: 0;
   border-radius: 0 0 0.7rem 0.7rem;
-  background-color: purple;
+  background-color: rgb(36, 36, 36);
+  border-top: none;
+  border-left: 1px rgba(255, 255, 255, 0.4) solid;
+  border-right: 1px rgba(255, 255, 255, 0.4) solid;
+  border-bottom: 1px rgba(255, 255, 255, 0.4) solid;
   color: black;
   transition: 0.5s;
   overflow-x: hidden;
   overflow-y: scroll;
-  z-index: 10;
+  z-index: 9999;
 }
 
 .show-popover {

@@ -3,20 +3,17 @@
   <div class="movie-general-info-div">
     <h3>{{ picked_movie.title }}</h3>
     <p class="movie-year"><b>{{ picked_movie.release_date.substring(0, 4) }}</b></p>
-    <!-- FIX NEEDED: get hashtag data from db -->
-    <span class="hashtags">sci-fi</span>
-    <span class="hashtags">action</span>
+    <span class="hashtags" v-for="(genre, idx) in picked_movie.genre_names" :key="idx" v-text="genre"></span>
     <!-- FIX NEEDED: cut sentence witha whole word -->
     <p class="movie-overview mt-4">{{ picked_movie.overview.substring(0, 200) + '...' }}</p>
     <hr>
-    <p><span class="role-span">Director : </span> Christopher Nolan</p>
-    <p><span class="role-span">Cast : </span> Tom Cruise, Lebron James, Harry Potter</p> 
+    <p><span class="role-span">Director : </span>{{ picked_movie.director_name || "N/A" }}</p>
+    <p><span class="role-span">Cast : </span>{{ (picked_movie.cast1_name ?  picked_movie.cast1_name : "N/A") + (picked_movie.cast2_name ? ", " : "") }}{{ (picked_movie.cast2_name ? picked_movie.cast2_name : "") + (picked_movie.cast3_name ? ", " : "") }}{{ picked_movie.cast3_name || "" }}</p> 
     <p><span class="role-span">Subscription : </span> Netflix</p> 
     <hr>
     <router-link :to="{ name: 'MovieDetail', params: { movie_id: picked_movie.id }}" class="detail-link text-decoration-none"><span class="review-span">Details</span></router-link> 
   </div>
   <div class="movie-ratings d-flex flex-column">
-    <!-- <div class="d-flex justify-content-between"> -->
     <div class="d-flex justify-content-center">
       <StarRating :rating="picked_movie.vote_average"/>
     </div>
