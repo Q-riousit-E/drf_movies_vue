@@ -5,11 +5,12 @@
     </transition>
   </div>
   <!-- FIX NEEDED: main nav not available when entered from not home -->
-  <router-view @showMainNav="showMainNav" @hideMainNav="hideMainNav" v-slot="{ Component }">
+  <!-- <router-view @showMainNav="showMainNav" @hideMainNav="hideMainNav" v-slot="{ Component }">
     <transition name="route" mode="out-in">
       <component :is="Component"></component>
     </transition>
-  </router-view>
+  </router-view> -->
+  <router-view @showMainNav="showMainNav" @hideMainNav="hideMainNav" />
 </template>
 
 <script>

@@ -21,6 +21,11 @@
           </div>
           <div class="my-popover invisible">
             <hr class="popover-hr">
+            <SearchedMovie 
+              v-for="(movie, idx) in searchedMovies" 
+              :key="idx" 
+              :movie="movie"
+            />
           </div>
 
           <!-- accounts (right) -->
@@ -72,8 +77,9 @@
 
 <script>
 import AuthForm from '@/components/AuthForm.vue'
+import SearchedMovie from '@/components/SearchedMovie.vue'
 
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
 
 import axios from 'axios'
@@ -81,7 +87,8 @@ import axios from 'axios'
 export default {
   name: 'MainNav',
   components: {
-    AuthForm
+    AuthForm,
+    SearchedMovie
   },
   setup() {
     // Get user info from store
@@ -111,109 +118,139 @@ export default {
       isLoginForm.value = true
     }
 
-
     // Logout
     const handleLogout = () => {
       store.dispatch('auth/logout')
     }
 
+    // Search Movies
+    const searchedMovies = ref([])
+
+    onMounted(() => {
+      // Grab elements
+      const searchInput = document.querySelector("#search-input");
+      const myPopover = document.querySelector(".my-popover");
+      const searchLabel = document.querySelector(".search-label");
+      const xIconDiv = document.querySelector(".x-icon");
+      const spinnerIcondiv = document.querySelector(".spinner-icon");
+
+      // clicking searchLabel focuses searchInput
+      searchLabel.addEventListener("click", () => {
+        searchInput.focus();
+      });
+
+      // focus and focusout events on searchInput
+      searchInput.addEventListener("focus", () => {
+        if (searchedMovies.value.length) {
+          myPopover.classList.add("show-popover");
+          myPopover.classList.remove("invisible");
+          searchInput.classList.add("input-with-popover");
+        }
+      });
+      searchInput.addEventListener("focusout", () => {
+        // use setTimeOut so a tag redirecting works for searched items
+        setTimeout(() => {
+          // myPopover.classList.remove("show-popover");
+          // myPopover.classList.add("invisible");
+          searchInput.classList.remove("input-with-popover");
+        }, 100);
+      });
+
+      // x-icon click event
+      xIconDiv.addEventListener("click", () => {
+        searchInput.value = "";
+        searchedMovies.value = []
+        myPopover.classList.remove("show-popover");
+        myPopover.classList.add("invisible");
+        searchInput.classList.remove("input-with-popover");
+        xIconDiv.classList.add("invisible");
+        spinnerIcondiv.classList.add("invisible");
+        searchLabel.classList.remove("invisible");
+      })
+
+      // initiate search via ajax (wait 0.5s until user finishes typing)
+      let timeout = null;
+      searchInput.addEventListener("keyup", e => {
+        // start spinner icon and remove search icon
+        xIconDiv.classList.add("invisible");
+        spinnerIcondiv.classList.remove("invisible");
+        searchLabel.classList.add("invisible");
+        
+        // clear timeout if change within 0.5s
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          // delete all previous data in popover
+          [...document.querySelectorAll(".popover-items")].forEach(item => {
+            item.remove();
+          });
+
+          // if search_word != empty -> request search
+          if (e.target.value) {
+            searchRequest(e.target.value);
+          } else {
+            myPopover.classList.remove("show-popover");
+            myPopover.classList.add("invisible");
+            searchInput.classList.remove("input-with-popover");
+            xIconDiv.classList.add("invisible");
+            spinnerIcondiv.classList.add("invisible");
+            searchLabel.classList.remove("invisible");
+          }
+        }, 500);
+      })
+
+      // axios request with the query
+      function searchRequest(query) {
+        console.log("seach for: ", query)
+        axios({
+          method: 'get',
+          url: "http://localhost:8000/api/v1/movie/search/",
+          params: {'q': query},
+        })
+          .then((res) => {
+            showSearchResults(res.data)
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+      }
+
+      // show Search Results
+      function showSearchResults(data) {
+        console.log(data)
+        searchedMovies.value = data
+
+        // show myPopover
+        if (data.length) {
+          myPopover.classList.add("show-popover");
+          myPopover.classList.remove("invisible");
+          searchInput.classList.add("input-with-popover");
+          searchLabel.classList.add("invisible");
+          xIconDiv.classList.remove("invisible");
+          spinnerIcondiv.classList.add("invisible");
+        } else {
+          searchInput.classList.remove("input-with-popover");
+          myPopover.classList.remove("show-popover");
+          myPopover.classList.add("invisible");
+          spinnerIcondiv.classList.add("invisible");
+          searchLabel.classList.remove("invisible");
+
+        }
+      }
+    })
+    
     return {
+      // auth
       decodedToken,
       authFormOn, isLoginForm,
       handleLoginClick, handleSignupClick,
       handleCancelAuth,
       handleChangeToSignup, handleChangeToLogin,
-      handleLogout
+      handleLogout,
+      
+      // search bar
+      searchedMovies
     }
   },
-  mounted() {
-    // Grab elements
-    const searchInput = document.querySelector("#search-input");
-    const myPopover = document.querySelector(".my-popover");
-    const searchLabel = document.querySelector(".search-label");
-    const xIconDiv = document.querySelector(".x-icon");
-    const spinnerIcondiv = document.querySelector(".spinner-icon");
-
-    // clicking searchLabel focuses searchInput
-    searchLabel.addEventListener("click", () => {
-      searchInput.focus();
-    });
-
-    // focus and focusout events on searchInput
-    searchInput.addEventListener("focus", () => {
-      if (searchInput.value) {
-        myPopover.classList.add("show-popover");
-        myPopover.classList.remove("invisible");
-        searchInput.classList.add("input-with-popover");
-      }
-    });
-    searchInput.addEventListener("focusout", () => {
-      // use setTimeOut so a tag redirecting works for searched items
-      setTimeout(() => {
-        myPopover.classList.remove("show-popover");
-        myPopover.classList.add("invisible");
-        searchInput.classList.remove("input-with-popover");
-      }, 100);
-    });
-
-    // x-icon click event
-    xIconDiv.addEventListener("click", () => {
-      searchInput.value = "";
-      myPopover.classList.remove("show-popover");
-      myPopover.classList.add("invisible");
-      searchInput.classList.remove("input-with-popover");
-      xIconDiv.classList.add("invisible");
-      spinnerIcondiv.classList.add("invisible");
-      searchLabel.classList.remove("invisible");
-    })
-
-    // initiate search via ajax (wait 0.5s until user finishes typing)
-    let timeout = null;
-    searchInput.addEventListener("keyup", e => {
-      // start spinner icon and remove search icon
-      xIconDiv.classList.add("invisible");
-      spinnerIcondiv.classList.remove("invisible");
-      searchLabel.classList.add("invisible");
-      
-      // clear timeout if change within 0.5s
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        // delete all previous data in popover
-        [...document.querySelectorAll(".popover-items")].forEach(item => {
-          item.remove();
-        });
-
-        // if search_word != empty -> request search
-        if (e.target.value) {
-          searchRequest(e.target.value);
-        } else {
-          myPopover.classList.remove("show-popover");
-          myPopover.classList.add("invisible");
-          searchInput.classList.remove("input-with-popover");
-          xIconDiv.classList.add("invisible");
-          spinnerIcondiv.classList.add("invisible");
-          searchLabel.classList.remove("invisible");
-        }
-      }, 500);
-    })
-
-    // axios request with the query
-    function searchRequest(query) {
-      console.log("seach for: ", query)
-      axios({
-        method: 'get',
-        url: "http://localhost:8000/api/v1/movies/search/",
-        params: {'q': query},
-      })
-        .then((res) => {
-          console.log(res)
-          showSearchResults(res)
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-    }
-  }
 }
 </script>
 
@@ -330,7 +367,7 @@ export default {
 }
 
 #check:checked+.search-box {
-  width: 40vw;
+  width: 24vw;
 }
 
 #check:checked+.search-box > input{
@@ -342,10 +379,10 @@ export default {
   left: 50%;
   transform: translate(-50%);
   top: 2.7rem;
-  width: 25vw;
+  width: 24vw;
   height: 0;
   border-radius: 0 0 0.7rem 0.7rem;
-  background-color: white;
+  background-color: purple;
   color: black;
   transition: 0.5s;
   overflow-x: hidden;
@@ -355,7 +392,7 @@ export default {
 
 .show-popover {
   height: initial;
-  max-height: 40vh;
+  max-height: 52vh;
 }
 
 .popover-hr {

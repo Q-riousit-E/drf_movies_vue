@@ -6,11 +6,14 @@
 
 <script>
 import { onMounted } from 'vue'
+
+import zingchart from 'zingchart/zingchart-es6.min.js';
+
 export default {
   name: 'ZingChart',
   setup() {
     onMounted(() => {
-      ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "b55b025e438fa8a98e32482b5f768ff5"];
+      // ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "b55b025e438fa8a98e32482b5f768ff5"];
       var myConfig = {
         type: 'radar',
         plot: {
@@ -20,14 +23,6 @@ export default {
             sequence: 1,
             speed: 5000
           },
-          // 'value-box': {
-          //   'font-family': "Georgia",
-          //   'font-size': 12,
-          //   'font-weight': "bold",
-          //   'font-color': 'white',
-          //   'offset-x': 0,
-          //   'offset-y': -15,
-          // },
         },
         scaleV: {
           visible: true,
