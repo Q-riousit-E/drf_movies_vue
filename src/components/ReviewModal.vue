@@ -12,7 +12,7 @@
       <h1><b>{{ decodedToken.username }}</b></h1>
       <h3>★ x {{ simpleRating }}</h3>
     </div>
-    <button v-if="!reviewSelected && !hexaSelected" class="btn btn-primary star-rating-btn">Submit Star Rating</button>
+    <button v-if="!reviewSelected && !hexaSelected" @click="submitStar" class="btn btn-primary star-rating-btn">Submit Star Rating</button>
 
     <div class="input-data-group">
       <!-- Review -->
@@ -22,14 +22,20 @@
           <!-- <span id="review-span" class="checkbox-tile" @click="toggleReviewSelected"> -->
           <span id="review-span" class="checkbox-tile">
             <!-- btns -->
-            <div id="review-btn-container" class="checkbox-label w-100 h-100" v-if="!reviewSelected" @click="submitReview">
-              <i class="icon fas fa-plus"></i>
+            <div id="review-btn-container" class="checkbox-label w-100 h-100" v-if="!reviewSelected">
+              <i class="icon fas fa-plus" v-if="!reviewData"></i>
+              <div v-else>
+                <i class="icon fas fa-edit edit-center"></i>
+                <div class="px-4 w-100 h-100" v-text="reviewData"></div>
+              </div>
+
             </div>
 
             <!-- input -->
             <div class="w-100 h-100" v-if="reviewSelected">
-              <textarea id="review-input" class="px-5"></textarea>
-              <button class="btn btn-primary star-review-btn" v-if="reviewSelected && !hexaSelected">Submit Star + Review</button>
+              <textarea id="review-input" class="px-4" v-if="!reviewData"></textarea>
+              <textarea id="review-input" class="px-4" v-else v-model="reviewData"></textarea>
+              <button class="btn btn-primary star-review-btn" v-if="reviewSelected && !hexaSelected" @click="submitComment">Submit Star + Comment</button>
             </div>
 
           </span>
@@ -44,22 +50,23 @@
           <span id="hexa-span" class="checkbox-tile">
             <!-- btns -->
             <div id="hexa-btn-container" class="checkbox-label" v-if="!hexaSelected">
-              <i class="icon fas fa-plus"></i>
-              <!-- <span class="checkbox-label"><i class="icon fas fa-edit"></i></span> -->
+              <i class="icon fas fa-plus" v-if="!hexaData"></i>
+              <i class="icon fas fa-edit" v-else></i>
+
               <!-- <span class="checkbox-label"><i class="icon far fa-edit"></i></span> -->
             </div>
 
             <!-- inputs -->
             <div class="w-100 h-100" v-if="hexaSelected">
               <input id="review-input" />
-              <button class="btn btn-primary star-hexa-btn" v-if="!reviewSelected && hexaSelected">Submit Star + Review</button>
+              <button class="btn btn-primary star-hexa-btn" v-if="!reviewSelected && hexaSelected" @click="submitHexa">Submit Star + Hexa</button>
             </div>
 
           </span>
         </label>
       </div>
     </div>
-    <button class="btn btn-primary star-review-hexa-btn" v-if="reviewSelected && hexaSelected">Submit Star + Review + Hexa</button>
+    <button class="btn btn-primary star-review-hexa-btn" v-if="reviewSelected && hexaSelected" @click="submitCommentHexa">Submit Star + Comment + Hexa</button>
   </div>
 </fieldset> 
 </template>
@@ -78,31 +85,12 @@ export default {
     // get data from store 
     const decodedToken = computed(() => store.state.auth.decodedToken)
     const simpleRating = computed(() => store.state.movies.simpleRating)
-    const reviewData = ref(null)
+    const reviewData = ref('이 영화 진짜 노잼')
     const hexaData = ref({plot: 3, cinematograpy: 4, originality: 5})  // dummy for testing
 
     // variables for user-info classes
     const reviewSelected = ref(false)
     const hexaSelected = ref(false)
-
-    // const toggleReviewSelected = (e) => {
-    //   console.log(e.target)
-    //   const reviewBtnContainer = document.querySelector('#review-btn-container')
-    //   const reviewSpan = document.querySelector('#review-span')
-    //   if (e.target === reviewBtnContainer || e.target === reviewSpan) {
-    //     // reviewSelected.value = !reviewSelected.value
-    //   }
-    //   console.log(reviewSelected.value, hexaSelected.value)
-    // }
-    // const toggleHexaSelected = (e) => {
-    //   console.log(e.target)
-    //   const hexaBtnContainer = document.querySelector('#hexa-btn-container')
-    //   const hexaSpan = document.querySelector('#hexa-span')
-    //   if (e.target === hexaBtnContainer || e.target === hexaSpan) {
-    //     // hexaSelected.value = !hexaSelected.value
-    //   }
-    //   console.log(reviewSelected.value, hexaSelected.value)
-    // }
 
     // Close Add modal on click background
     const closeReviewModal = (e) => {
@@ -111,12 +99,33 @@ export default {
         emit('closeReviewModal')
       }
     }
+
+    //// Submit reviews
+    // 1. just star
+    const submitStar = () => {
+      console.log('submit star')
+    }
+
+    // 2. star + comment
+    const submitComment = () => {
+      console.log('submit comment:', reviewData.value)
+    }
+
+    // 3. star + hexa
+    const submitHexa = () => {
+      console.log('submit star + hexa')
+    }
+
+    // 4. star + comment + hexa
+    const submitCommentHexa = () => {
+      console.log('submit star + comment + hexa')
+    }
     
     return {
       decodedToken, simpleRating, reviewData, hexaData,
       reviewSelected, hexaSelected,
-      //  toggleReviewSelected, toggleHexaSelected,
-      closeReviewModal
+      closeReviewModal,
+      submitStar, submitComment, submitHexa, submitCommentHexa
     }
   }
 }
@@ -318,7 +327,7 @@ export default {
 
 #review-input {
   width: 100%;
-  height: 90%;
+  height: 100%;
   border: none;
   font-size: 2rem;
 }
@@ -340,5 +349,10 @@ export default {
 .star-review-hexa-btn {
   width: 100%;
   margin-top: auto;
+}
+
+.edit-center {
+  position: absolute;
+  
 }
 </style>
