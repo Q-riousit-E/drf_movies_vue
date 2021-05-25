@@ -1,4 +1,5 @@
 <template>
+<div>
 	<!-- Three.js canvas -->
   <canvas id="c" :class="{ invisible: loadingThree, showAnimation: !loadingThree }"></canvas>
 
@@ -25,7 +26,6 @@
     />
   </transition>
 
-	<!-- MUST FIX TRANSITION -->
 	<transition name="fade" mode="out-in">
 		<ScrollNav @onClickNavMenu="handleClickNavMenu" :currMovieGenre="currMovieGenre" v-show="!isVisible && !loadingThree" />
 	</transition>
@@ -39,6 +39,7 @@
     </span>
     <h2 class="scroll-text">Scroll</h2>
   </section>
+</div>
 </template>
 
 <script>
@@ -55,11 +56,11 @@ export default {
     ScrollNav,
     MovieInfoBox
   },
-	emits: ['showMainNav'],
+	emits: ['showMainNav', 'hideMainNav'],
   setup(props, { emit }) {
     ///////////////////////////////////
     // init
-		console.log(props)
+		emit('hideMainNav')
     const store = useStore()
 
 		///////////////////////////////////
@@ -144,7 +145,7 @@ export default {
 }
 
 .showAnimation {
-  animation: fadeIn 6s ease-in
+  animation: fadeIn 3s ease-in
 }
 
 @keyframes fadeIn {
@@ -159,6 +160,7 @@ export default {
 .dg {
 	position: relative;
 	z-index: 4;
+	display: none;
 }
 
 /* Progress Bar */

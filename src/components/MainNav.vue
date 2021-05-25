@@ -1,87 +1,129 @@
 <template>
-<nav class="navbar navbar-expand-lg navbar-dark my-navbar">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="/">pjt</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav d-flex justify-content-between align-items-center" style="width: 100%;">
-        <!-- left-side-->
-        <div class='d-flex'>
-          <li class="nav-item">
-            <router-link class="nav-link" :to="{ name: 'Home' }">Home</router-link>
-          </li>
-        </div>
+<div>
+  <nav class="navbar navbar-expand-lg navbar-dark my-navbar">
+    <div class="navbar-container container-fluid">
+      <router-link :to="{ name: 'Home' }" class="my-brand navbar-brand">Movie Talk</router-link>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav d-flex justify-content-between align-items-center" style="width: 100%;">
+          <!-- left-side empty div for layout -->
+          <div></div>
 
-        <!-- Search (center)-->
-        <input type="checkbox" id="check">
-        <div class="search-box">
-          <input id="search-input" type="text" placeholder="Search...">
-          <label class="search-label" for="check"><i class="fas fa-search search-icon"></i></label>
-          <div class="x-icon invisible"><i class="fas fa-times-circle"></i></div>
-          <div class="spinner-icon invisible"><i class="fas fa-spinner fa-spin"></i></div>
-        </div>
-        <div class="my-popover invisible">
-          <hr class="popover-hr">
-        </div>
+          <!-- Search (center)-->
+          <input type="checkbox" id="check">
+          <div class="search-box">
+            <input id="search-input" type="text" placeholder="Search...">
+            <label class="search-label" for="check"><i class="fas fa-search search-icon"></i></label>
+            <div class="x-icon invisible"><i class="fas fa-times-circle"></i></div>
+            <div class="spinner-icon invisible"><i class="fas fa-spinner fa-spin"></i></div>
+          </div>
+          <div class="my-popover invisible">
+            <hr class="popover-hr">
+          </div>
 
-        <!-- accounts (right) -->
+          <!-- accounts (right) -->
           <!-- if logged in -->
-        <div v-if="decodedToken">
-          <div class='d-flex'>
-            <li class="nav-item dropdown me-3">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" type="button" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <!-- {% if user.profile_img %} -->
-                <!-- <img class="profile-img me-2" src="{{ user.profile_img.url }}" alt="{{ user.username }}'s profile image"> -->
-                <!-- {% endif %} -->
-                {{ decodedToken.username }}
-              </a>
-              <ul class="dropdown-menu profile-dropdown" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="#">Profile</a></li>
-                <li><a class="dropdown-item" href="#">sth</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><router-link class="dropdown-item" :to="{ name: 'Logout' }">Logout</router-link></li>
-              </ul>
-            </li>
+          <div class="nav-accounts">
+            <div v-if="decodedToken">
+              <div class='d-flex'>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" type="button" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <!-- {% if user.profile_img %} -->
+                    <!-- <img class="profile-img me-2" src="{{ user.profile_img.url }}" alt="{{ user.username }}'s profile image"> -->
+                    <!-- {% endif %} -->
+                    {{ decodedToken.username }}
+                  </a>
+                  <ul class="dropdown-menu profile-dropdown" aria-labelledby="navbarDropdown">
+                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li><a class="dropdown-item" href="#">sth</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><button class="dropdown-item" @click="handleLogout">Logout</button></li>
+                  </ul>
+                </li>
+              </div>
+            </div>
+            <!-- if not logged in -->
+            <div v-else>
+              <div class="d-flex">
+                <li class="nav-item">
+                  <button class="nav-link auth-btn" @click="handleLoginClick">Login</button>
+                </li>
+                <li class="nav-item">
+                  <button class="nav-link auth-btn" @click="handleSignupClick">Signup</button>
+                </li>
+              </div>
+            </div>
           </div>
-        </div>
-        <!-- if not logged in -->
-        <div v-else>
-          <div class="d-flex">
-            <li class="nav-item">
-              <router-link class="nav-link" :to="{ name: 'Login' }">Login</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link class="nav-link" :to="{ name: 'Signup' }">Signup</router-link> 
-            </li>
-          </div>
-        </div>
-      </ul>
+        </ul>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
+  <AuthForm 
+    v-if="authFormOn" 
+    :isLoginForm="isLoginForm" 
+    @cancelAuth="handleCancelAuth"
+    @changeToSignup="handleChangeToSignup"
+    @changeToLogin="handleChangeToLogin"
+  />
+</div>
 </template>
 
 <script>
-import { computed, watch } from 'vue'
+import AuthForm from '@/components/AuthForm.vue'
+
+import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
 
 import axios from 'axios'
 
 export default {
   name: 'MainNav',
+  components: {
+    AuthForm
+  },
   setup() {
     // Get user info from store
     const store = useStore()
     const decodedToken = computed(() => store.state.auth.decodedToken)
 
-    watch(decodedToken, () => {
-      console.log(decodedToken)
-    })
+    // Login, Signup
+    const authFormOn = ref(false)
+    const isLoginForm = ref(true)
+
+    const handleLoginClick = () => {
+      authFormOn.value = true
+      isLoginForm.value = true
+    }
+    const handleSignupClick = () => {
+      authFormOn.value = true
+      isLoginForm.value = false
+    }
+    const handleCancelAuth = () => {
+      authFormOn.value = false
+    }
+    const handleChangeToSignup = () => {
+      console.log('changed in mainnav')
+      isLoginForm.value = false
+    }
+    const handleChangeToLogin = () => {
+      isLoginForm.value = true
+    }
+
+
+    // Logout
+    const handleLogout = () => {
+      store.dispatch('auth/logout')
+    }
 
     return {
-      decodedToken
+      decodedToken,
+      authFormOn, isLoginForm,
+      handleLoginClick, handleSignupClick,
+      handleCancelAuth,
+      handleChangeToSignup, handleChangeToLogin,
+      handleLogout
     }
   },
   mounted() {
@@ -175,11 +217,25 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .my-navbar {
-  height: 6vh;
+  height: 5.5vh;
   z-index: 3;
   background-color: rgba(255, 255, 255, 0.1);
+}
+
+.navbar-container {
+  margin: 0;
+  padding: 0;
+}
+
+.my-brand {
+  padding-left: 3vw;
+}
+
+.auth-btn {
+  background: none;
+  border: none;
 }
 
 /* searchbar */
@@ -210,7 +266,19 @@ export default {
 }
 
 .search-box label:hover {
-  color: black;
+  animation: searchColorToggle 0.5s ease infinite;
+}
+
+@keyframes searchColorToggle {
+  0% {
+    color: gray;
+  }
+  50% {
+    color: black;
+  }
+  100% {
+    color: gray;
+  }
 }
 
 .search-box input {
@@ -262,7 +330,7 @@ export default {
 }
 
 #check:checked+.search-box {
-  width: 25vw;
+  width: 40vw;
 }
 
 #check:checked+.search-box > input{
@@ -308,6 +376,10 @@ export default {
 }
 
 /* accounts */
+.nav-accounts {
+  padding-right: 3vw;
+}
+
 .profile-dropdown {
   min-width: 100%;
   z-index: 60;

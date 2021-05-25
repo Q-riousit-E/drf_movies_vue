@@ -35,7 +35,6 @@ export default {
       setTimeout(() => {
         //// Chart Data
         const simpleRatingData = store.state.movies.picked_movie.simple_rating_counts
-        console.log(simpleRatingData)
         const numOfRatingsPerScore = [
           simpleRatingData['0.5'],
           simpleRatingData['1.0'],
@@ -63,12 +62,17 @@ export default {
         const chart1Data = {
           type: 'bar',
           plot: {
+            'value-box': {
+              'font-size': 12,
+              // 'font-weight': "bold",
+              'font-color': 'rgb(160, 157, 157)',
+            },
             animation: {
               effect: 4,
               sequence:1,
               speed: 10000
             },
-            barWidth: '0.75rem'
+            barWidth: '0.75rem',
           },
           globals: {
             fontFamily: 'Poppins'
@@ -76,7 +80,10 @@ export default {
           backgroundColor: 'transparent',
           scaleX: {
             // labels: ['0.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5', '5'],
-            labels: ['', '★', '', '★★', '', '★★★', '', '★★★★', '', '★★★★★'],
+            labels: ['', '★', '', '★ x 2', '', '★ x 3', '', '★ x 4', '', '★ x 5'],
+            item: {
+              fontColor: 'rgb(220, 220, 220)',
+            },
             tick: {
               visible: false
             }
@@ -89,7 +96,10 @@ export default {
             guide: {
               lineStyle: 'solid',
               lineColor: 'var(--lightGray)'
-            }
+            },
+            item: {
+              fontColor: 'rgb(220, 220, 220)',
+            },
           },
           plotarea: {
             margin: 'dynamic'
@@ -125,8 +135,6 @@ export default {
               'font-size': 12,
               'font-weight': "bold",
               'font-color': 'white',
-              'offset-x': 0,
-              'offset-y': -10,
             },
           },
           scaleV: {

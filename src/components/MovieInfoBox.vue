@@ -13,12 +13,11 @@
     <p><span class="role-span">Cast : </span> Tom Cruise, Lebron James, Harry Potter</p> 
     <p><span class="role-span">Subscription : </span> Netflix</p> 
     <hr>
-    <router-link :to="{ name: 'MovieDetail', params: { movie_id: picked_movie.id }}" class="text-decoration-none"><span class="review-span">Details</span></router-link> 
+    <router-link :to="{ name: 'MovieDetail', params: { movie_id: picked_movie.id }}" class="detail-link text-decoration-none"><span class="review-span">Details</span></router-link> 
   </div>
   <div class="movie-ratings d-flex flex-column">
     <!-- <div class="d-flex justify-content-between"> -->
     <div class="d-flex justify-content-center">
-      <!-- <StarRating :rating="picked_movie.vote_average"/> -->
       <StarRating :rating="picked_movie.vote_average"/>
     </div>
     <ZingChart />
@@ -115,6 +114,22 @@ export default {
 
 .review-span {
   color: cornflowerblue;
+}
+
+.review-span:hover {
+  animation: colorToggle 0.5s ease-in-out infinite;
+}
+
+@keyframes colorToggle {
+  0% {
+    color: cornflowerblue;
+  }
+  50% {
+    color: rgb(15 96 241)
+  }
+  100% {
+    color: cornflowerblue;
+  }
 }
 
 /* .review-a {

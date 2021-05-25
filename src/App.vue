@@ -1,26 +1,17 @@
 <template>
-  <!-- <div id="nav" v-if="mainNavShow"> -->
-  <!-- <div id="nav" v-if="true">
-    <router-link :to="{ name: 'Home' }">Home</router-link> |
-    <router-link :to="{ name: 'Articles' }">Articles</router-link> |
-    <router-link :to="{ name: 'Signup' }">Signup</router-link> |
-    <router-link :to="{ name: 'Login' }">Login</router-link> | 
-    <router-link :to="{ name: 'Logout' }">Logout</router-link> |
-    <router-link :to="{ name: 'Testing' }">Testing</router-link> |
-  </div> -->
-  <MainNav />
-  <!-- FIX NEEDED: main nav not available when entered from not home -->
-  <router-view @showMainNav="showMainNav"/>
-
-  <!-- MUST FIX: stop three from reloading  -->
-  <!-- <router-view v-slot="Home">
-    <transition>
-      <keep-alive>
-        <component :is="Home" />
-      </keep-alive>
+  <div>
+    <transition name="fade">
+      <MainNav v-if="mainNavShow" />
     </transition>
-  </router-view> -->
+  </div>
+  <!-- FIX NEEDED: main nav not available when entered from not home -->
+  <router-view @showMainNav="showMainNav" @hideMainNav="hideMainNav" v-slot="{ Component }">
+    <transition name="route" mode="out-in">
+      <component :is="Component"></component>
+    </transition>
+  </router-view>
 </template>
+
 <script>
 import { defineComponent, ref } from 'vue'
 import gsap from 'gsap'
@@ -33,10 +24,14 @@ export default defineComponent({
   },
   setup() {
     // hidden navbar for first load
-    const mainNavShow = ref(false)
+    const mainNavShow = ref(true)
     const showMainNav = () => {
 			console.log('showmainnav')
       mainNavShow.value = true
+    }
+    const hideMainNav = () => {
+			console.log('hidemainnav')
+      mainNavShow.value = false
     }
 
     // custom cursor
@@ -112,7 +107,7 @@ export default defineComponent({
     window.addEventListener('mouseup', mouseup, false);
 
     return {
-      mainNavShow, showMainNav,
+      mainNavShow, showMainNav, hideMainNav,
       Home
     }
   },
@@ -171,5 +166,39 @@ body, html {
 	 pointer-events: none;
 	 opacity: .5;
 	 z-index: 999;
+}
+
+/* Transition */
+.fade-enter-from,
+.fade-leave-to {
+	opacity: 0;
+}
+
+.fade-enter-to,
+.fade-leave-from {
+	opacity: 1;
+}
+
+.fade-enter-active {
+	transition: opacity 0.6s ease;
+}
+
+.fade-leave-active {
+  transition: opaticy 0.1s linear;
+}
+
+.route-enter-from {
+  opacity: 0;
+  transform: translateX(-100px);
+}
+
+.route-leave-to {
+  opacity: 0;
+  transform: translateX(100px);
+}
+
+.route-enter-active,
+.route-leave-active {
+  transition: all 0.3s ease-in;
 }
 </style>

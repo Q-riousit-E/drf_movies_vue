@@ -17,9 +17,6 @@ import gsap from 'gsap'
 
 // data to be received from vue
 function main(progressCount, movieObjs, isVisible, loadingThree, picked_movie_id, currMovieGenre) {
-  // // test
-  // console.log(movieObjs)
-
   ////////////////////////////////////////////////////////////////////////
   //// Setup
   const canvas = document.querySelector('#c')
@@ -28,7 +25,9 @@ function main(progressCount, movieObjs, isVisible, loadingThree, picked_movie_id
   const loader = new THREE.TextureLoader(loadManager)
   const gui = new GUI()
   const gsapDuration = 1
-  // scene.background = new THREE.Color('gray')
+
+  // toggle gui off option
+  gui.destroy()
   
   // Camera
   const fov = 80    // field of view in degrees

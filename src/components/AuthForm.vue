@@ -1,54 +1,106 @@
 <template>
-  <div v-if="token">
-    <h1>User is already logged in</h1>
-  </div>
-  <div v-else class="wrapper fadeInDown" >
+<div class="authForm" @click="handleCancelAuth">
+<!-- <transition name="pushRight" mode="out-in"> -->
+  <!-- Login Form -->
+  <div v-if="isLoginForm" class="wrapper fadeInDown" >
     <div id="formContent">
       <!-- Tabs Titles -->
-      <h2 class="sign-in active"> Sign In </h2>
+      <h2 class="sign-in active"> Login </h2>
 
       <!-- Login Form -->
       <form @submit="submitLogin">
-        <input type="text" id="login" class="fadeIn second" name="login" placeholder="login" v-model="credentials.username">
+        <input type="text" id="login" class="fadeIn second" name="login" placeholder="username" v-model="credentials.username">
         <input type="password" id="password" class="fadeIn third" name="password" placeholder="password" v-model="credentials.password" @keyup.enter="submitLogin">
-        <input type="submit" class="fadeIn fourth" value="Log In">
+        <input type="submit" class="fadeIn fourth mt-3" value="Log In">
       </form>
 
       <!-- Remind Passowrd -->
-      <div id="formFooter">
+      <div id="formFooter" class="d-flex justify-content-evenly">
+        <a class="underlineHover" href="#" @click="changeToSignup">Signup</a>
         <a class="underlineHover" href="#">Forgot Password?</a>
       </div>
 
     </div>
   </div>
+
+  <!-- Signup Form -->
+  <div v-else class="wrapper fadeInDown" >
+    <div id="formContent">
+      <!-- Tabs Titles -->
+      <h2 class="sign-in active"> Signup </h2>
+
+      <!-- Login Form -->
+      <form @submit="submitSignup">
+        <input type="text" id="login" class="fadeIn second" name="login" placeholder="username" v-model="credentials.username">
+        <input type="password" id="password" class="fadeIn third" name="password" placeholder="password" v-model="credentials.password">
+        <input type="password" id="passwordConfirmation" class="fadeIn third" name="passwordConfirmation" placeholder="password confirmation" v-model="credentials.passwordConfirmation" @keyup.enter="submitLogin">
+        <input type="submit" class="fadeIn fourth" value="Signup">
+      </form>
+
+      <!-- Remind Passowrd -->
+      <div id="formFooter">
+        <p>Already have an account? <span class="login-span" @click="changeToLogin">Login</span></p>
+      </div>
+
+    </div>
+  </div>
+<!-- </transition> -->
+</div>
 </template>
 
 <script>
 import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
-
 export default {
-  name: 'Login',
-
-  setup() {
-    // Vuex: Check if user is logged in
+  name: 'AuthForm',
+  props: ['isLoginForm'],
+  emits: ['cancelAuth', 'changeToSignup', 'changeToLogin'],
+  setup(props, { emit }) {
+    // init
     const store = useStore()
-    const token = computed(() => store.state.auth.token)
 
-    // Login
+    // Auth form Events
+    const handleCancelAuth = (e) => {
+      const authFormWrapper = document.querySelector('.wrapper')
+      if (authFormWrapper === e.target) {
+        console.log('clicked outside')
+        emit('cancelAuth')
+      }
+    }
+
+    const changeToSignup = (e) => {
+      console.log('change to signup', e.target)
+      emit('changeToSignup')
+    }
+
+    const changeToLogin = () => {
+      emit('changeToLogin')
+    }
+
+    // Auth
+    const isLoginForm = computed(() => props.isLoginForm)
     const credentials = ref({
-      username: 'admin1',
-      password: 'asdfasdfqwer',
+      username: '',
+      password: '',
+      passwordConfirmation: '',
     })
-    
+
     const submitLogin = async (e) => {
       e.preventDefault()
       store.dispatch('auth/login', credentials.value)
+      emit('cancelAuth')
+    }
+    const submitSignup = async (e) => {
+      e.preventDefault()
+      store.dispatch('auth/signup', credentials.value)
+      emit('changeToLogin')
     }
 
     return {
-      token,
-      credentials, submitLogin
+      handleCancelAuth, changeToSignup, changeToLogin,
+      isLoginForm,
+      credentials,
+      submitLogin, submitSignup
     }
   }
 }
@@ -56,6 +108,19 @@ export default {
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css?family=Poppins');
+
+.authForm {
+  z-index: 200;
+  position: absolute;
+  top: 0;
+  height: 100vh;
+  width: 100vw;
+  background: rgb(0, 0, 0, 0.75);
+}
+
+.login-span {
+  color: #609ae9;
+}
 
 /* BASIC */
 body {
@@ -84,6 +149,7 @@ a {
 
 /* STRUCTURE */
 .wrapper {
+  z-index: 300;
   display: flex;
   align-items: center;
   flex-direction: column; 
@@ -119,7 +185,6 @@ a {
 
 
 /* TABS */
-
 h2.inactive {
   color: #cccccc;
 }
@@ -147,7 +212,7 @@ input[type=button], input[type=submit], input[type=reset]  {
   box-shadow: 0 10px 30px 0 rgba(95,186,233,0.4);
   -webkit-border-radius: 5px 5px 5px 5px;
   border-radius: 5px 5px 5px 5px;
-  margin: 5px 20px 40px 20px;
+  margin: 1rem;
   -webkit-transition: all 0.3s ease-in-out;
   -moz-transition: all 0.3s ease-in-out;
   -ms-transition: all 0.3s ease-in-out;
@@ -302,5 +367,19 @@ input[type=password]:placeholder {
 
 .underlineHover:hover:after{
   width: 100%;
+}
+
+/* Transition */
+.pushRight-enter-from {
+  opacity: 0;
+  transform: translateX(-100px);
+}
+.pushRight-leave-to {
+  opacity: 0;
+  transform: translateX(-100px);
+}
+.pushRight-enter-active,
+.pushRight-leave-active {
+  transition: all 0.5s ease-in;
 }
 </style>

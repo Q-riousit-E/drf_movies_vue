@@ -70,6 +70,7 @@ const actions = {
         commit('SET_SIMPLE_RATING', res.data.rating)
       })
       .catch((err) => {
+        commit('SET_SIMPLE_RATING', 0)
         console.log(err)
       })
   },
@@ -113,7 +114,6 @@ const actions = {
     }
   },
   deleteSimpleRating({ commit, rootState }, movie_id) {
-    console.log(movie_id)
     axios({
       method: 'delete',
       url : moviesURL + `${movie_id}/simple_rating/`,
