@@ -14,7 +14,7 @@
   </div>
   <div class="movie-ratings d-flex flex-column">
     <div class="d-flex justify-content-center" style="margin-top: 0.8rem;">
-      <StarRating :rating="picked_movie.vote_average"/>
+      <StarRating :rating="picked_movie.star_average"/>
     </div>
     <ZingChart />
   </div>
