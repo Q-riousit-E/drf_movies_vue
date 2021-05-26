@@ -35,7 +35,7 @@
       <!-- Reviews -->
       <div class="d-flex justify-content-between align-items-center w-100">
         <h5 class="mb-3">Reviews</h5>
-        <span class="add-review-span" @click="handleOpenReviewModal"><i class="far fa-plus-square me-1" style="padding-bottom: 0.1rem"></i> Add a Review</span>
+        <span class="add-review-span" @click="handleOpenReviewModal"><i class="far fa-plus-square mx-1" style="padding-bottom: 0.1rem"></i> Add a Review</span>
       </div>
     
       <ReviewList />

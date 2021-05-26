@@ -160,12 +160,12 @@ function main(progressCount, movieObjs, isVisible, loadingThree, picked_movie_id
     // w92 for faster loading for testing -> change to w500 for final result
     // const material = new THREE.MeshStandardMaterial({map: loader.load(movieObj.poster_path.replace('/original/', '/w500/'))})
     const materials = [
+      new THREE.MeshStandardMaterial({map: loader.load(movieObj.poster_path1.replace('/original/', '/w500/'))}),
+      new THREE.MeshStandardMaterial({map: loader.load(movieObj.poster_path2.replace('/original/', '/w500/'))}),
       new THREE.MeshStandardMaterial({map: loader.load(movieObj.poster_path1.replace('/original/', '/w92/'))}),
-      new THREE.MeshStandardMaterial({map: loader.load(movieObj.poster_path2.replace('/original/', '/w92/'))}),
       new THREE.MeshStandardMaterial({map: loader.load(movieObj.poster_path1.replace('/original/', '/w92/'))}),
-      new THREE.MeshStandardMaterial({map: loader.load(movieObj.poster_path1.replace('/original/', '/w92/'))}),
-      new THREE.MeshStandardMaterial({map: loader.load(movieObj.poster_path3.replace('/original/', '/w92/'))}),
-      new THREE.MeshStandardMaterial({map: loader.load(movieObj.poster_path4.replace('/original/', '/w92/'))}),
+      new THREE.MeshStandardMaterial({map: loader.load(movieObj.poster_path3.replace('/original/', '/w500/'))}),
+      new THREE.MeshStandardMaterial({map: loader.load(movieObj.poster_path4.replace('/original/', '/w500/'))}),
     ]
     // const material = new THREE.MeshStandardMaterial({map: loader.load(movieObj.poster_path)})
     const movie = new THREE.Mesh(geometry, materials);
