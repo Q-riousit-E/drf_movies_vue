@@ -289,7 +289,7 @@ export default {
 <style scoped>
 .my-navbar {
   height: 5.5vh;
-  z-index: 3;
+  z-index: 999;
   background-color: rgba(255, 255, 255, 0.1);
 }
 
