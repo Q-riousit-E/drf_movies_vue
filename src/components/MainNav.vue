@@ -14,7 +14,7 @@
           <!-- Search (center)-->
           <input type="checkbox" id="check">
           <div class="search-box">
-            <input id="search-input" type="text" placeholder="Try 'movie name' or '#genre'">
+            <input id="search-input" type="text" autocomplete="off" placeholder="Try 'movie name' or '#genre'">
             <label class="search-label" for="check"><i class="fas fa-search search-icon"></i></label>
             <div class="x-icon invisible"><i class="fas fa-times-circle"></i></div>
             <div class="spinner-icon invisible"><i class="fas fa-spinner fa-spin"></i></div>
