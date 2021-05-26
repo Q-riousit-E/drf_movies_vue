@@ -10,7 +10,14 @@ const state = {
   simpleRating: 0,
   suggested_movies: null,
   myComment: '',
-  myHexa: null
+  myHexa: {
+    originality: 0,
+    plot: 0,
+    cinematography: 0,
+    music_score: 0,
+    characters: 0,
+    entertainment_value: 0,
+  }
 }
 
 const mutations = {
@@ -45,7 +52,10 @@ const mutations = {
   // Hexa Rating
   SET_MY_HEXA(state, hexa) {
     state.myHexa = hexa
-  }
+  },
+  UPDATE_MY_HEXA(state, hexa) {
+    state.myHexa = hexa
+  },
 }
 
 const actions = {
@@ -272,7 +282,79 @@ const actions = {
         commit('SET_MY_HEXA', res.data)
       })
       .catch((err) => {
-        commit('SET_MY_HEXA', null)
+        commit('SET_MY_HEXA', {
+          originality: 0,
+          plot: 0,
+          cinematography: 0,
+          music_score: 0,
+          characters: 0,
+          entertainment_value: 0,
+        })
+      })
+  },
+  updateHexa({ commit, rootState }, { movie_id, hexaData }) {
+    const submitData = {
+      originality: hexaData.originality,
+      plot: hexaData.plot,
+      cinematography: hexaData.cinematography,
+      music_score: hexaData.music_score,
+      characters: hexaData.characters,
+      entertainment_value: hexaData.entertainment_value,
+    }
+    console.log(submitData)
+    if (rootState.movies.myHexa.originality) {
+      // PUT request
+      console.log('update hexaData')
+      console.log(hexaData)
+      axios({
+        method: 'put',
+        url: moviesURL + `${movie_id}/detailed-rating/`,
+        headers: {
+          Authorization: 'JWT ' + rootState.auth.token
+        },
+        data: submitData
+      })
+        .then((res) => {
+          console.log(res.data)
+          commit('UPDATE_MY_HEXA', res.data)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+
+    } else {
+      // POST request
+      axios({
+        method: 'post',
+        url: moviesURL + `${movie_id}/detailed-rating/`,
+        headers: {
+          Authorization: 'JWT ' + rootState.auth.token
+        },
+        data: submitData
+      })
+        .then((res) => {
+          commit('UPDATE_MY_HEXA', res.data)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    }
+  },
+  deleteHexa({ commit, rootState }, movie_id) {
+    const myHexa = rootState.movies.myHexa
+    axios({
+      method: 'delete',
+      url: moviesURL + `${movie_id}/detailed-rating/`,
+      headers: {
+        Authorization: 'JWT ' + rootState.auth.token
+      }
+    })
+      .then((res) => {
+        console.log(res.data)
+        commit('UPDATE_MY_HEXA', res.data)
+      })
+      .catch((err) => {
+        console.log(err)
       })
   }
 

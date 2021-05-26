@@ -1,5 +1,4 @@
 <template>
-<div class="container mt-5"></div>
 <div class="row" style="color: black;">
   <div class="col-6 star-container">
     <div>Originality</div>
@@ -106,6 +105,7 @@ export default {
 
       // initial data setting
       setTimeout(() => {
+        console.log(hexaData.value)
         rater1.setRating(hexaData.value.originality)
         rater2.setRating(hexaData.value.plot)
         rater3.setRating(hexaData.value.cinematography)

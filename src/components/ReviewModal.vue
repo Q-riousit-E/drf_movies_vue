@@ -50,7 +50,7 @@
           <span id="hexa-span" class="checkbox-tile" @click="cancelHexaSpanClick">
             <!-- btns -->
             <div id="hexa-btn-container" class="checkbox-label w-100 h-100" v-if="!hexaSelected">
-              <i class="icon fas fa-plus" v-if="!hexaDataFromStore"></i>
+              <i class="icon fas fa-plus" v-if="!hexaDataFromStore.originality"></i>
               <div class="w-100 h-100" v-else>
                 <!-- formerly Written review -->
                 <HexaStarRating />
@@ -64,7 +64,7 @@
             <!-- inputs -->
             <div class="w-100 h-100" v-if="hexaSelected">
               <HexaStarRating @setHexaData="handleGetHexaFromForm" />
-              <button class="btn btn-primary star-review-btn" v-if="hexaSelected && !reviewSelected" @click="submitHexa">Submit Star + Hexa</button>
+              <button class="btn btn-primary star-review-btn" v-if="hexaSelected && !reviewSelected" @click="handleSubmitHexa">Submit Star + Hexa</button>
             </div>
             <p style="color: white;">hexaSelected: {{ hexaSelected }}</p>
             <p style="color: white;">hexaData: {{ hexaData }}</p>
@@ -100,7 +100,14 @@ export default {
     // get data from store 
     const decodedToken = computed(() => store.state.auth.decodedToken)
     const simpleRating = computed(() => store.state.movies.simpleRating)
-    const commentData = ref('')
+    const commentData = ref({
+      originality: 0,
+      plot: 0,
+      cinematography: 0,
+      music_score: 0,
+      characters: 0,
+      entertainment_value: 0,
+    })
     const commentDataFromStore = computed(() => store.state.movies.myComment)
     const hexaData = ref(null)
     const hexaDataFromStore = computed(() => store.state.movies.myHexa)
@@ -137,17 +144,27 @@ export default {
     }
 
     // 2. star + hexa
-    const submitHexa = () => {
-      console.log('submit star + hexa', hexaData.value)
-    }
     const handleGetHexaFromForm = (data) => {
       hexaData.value[data.rater] = data.value
     }
+    const handleSubmitHexa = () => {
+      console.log('submit star + hexa', hexaData.value)
+      store.dispatch('movies/updateHexa', {movie_id: route.params.movie_id, hexaData: hexaData.value})
+      closeReviewModal()
+    }
+    const handleDeleteHexa = () => {
+      store.dispatch('movies/deleteHexa', route.params.movie_id)
+    }
     const cancelHexaSpanClick = (e) => {
-      if (hexaSelected.value) {
+      const hexaSpan = document.querySelector('#hexa-span')
+      console.log(e.target)
+
+      // if hexaspan is clicked while hexa is selected -> unselect hexa
+      if (e.target === hexaSpan) {
+        console.log(e.target)
+      } else if (hexaSelected.value) {
         e.preventDefault()
       }
-      console.log(e.target)
     }
 
 
@@ -178,7 +195,7 @@ export default {
       reviewSelected, hexaSelected,
       handleCloseReviewModal,
       submitComment, 
-      handleGetHexaFromForm, cancelHexaSpanClick, submitHexa,
+      handleGetHexaFromForm, cancelHexaSpanClick, handleSubmitHexa, handleDeleteHexa,
       submitCommentHexa,
       handleDeleteComment,
     }
