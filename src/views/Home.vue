@@ -19,12 +19,11 @@
 	</transition>
 
 	<!-- Movie Info Box -->
-  <transition name="switch">
-    <MovieInfoBox 
-      v-if="isVisible"
-      @onResetPickImage="onResetPickImage"
-    />
-  </transition>
+  <!-- <transition name="switch"> -->
+	<MovieInfoBox 
+		v-if="isVisible"
+	/>
+  <!-- </transition> -->
 
 	<transition name="fade" mode="out-in">
 		<ScrollNav @onClickNavMenu="handleClickNavMenu" :currMovieGenre="currMovieGenre" v-show="!isVisible && !loadingThree" />
@@ -56,11 +55,11 @@ export default {
     ScrollNav,
     MovieInfoBox
   },
-	emits: ['showMainNav', 'hideMainNav'],
+	// emits: ['showMainNav', 'hideMainNav'],
   setup(props, { emit }) {
     ///////////////////////////////////
     // init
-		emit('hideMainNav')
+		// emit('hideMainNav')
     const store = useStore()
 
 		///////////////////////////////////
@@ -71,7 +70,7 @@ export default {
 			const bar = document.querySelector('.progress-bar')
 			bar.style.width = progressCount.value + '%'
 			if (progressCount.value === 100) {
-				emit('showMainNav')
+				// emit('showMainNav')
 			}
 		})
 
@@ -83,9 +82,6 @@ export default {
 		const currMovieGenre = ref('sci_fi')
     const handleClickNavMenu = (genre) => {
       main.onScrollEvent(genre)
-    }
-    const onResetPickImage = () => {
-      main.resetPickImage()
     }
 
 		// three -> change data in store 
@@ -121,7 +117,6 @@ export default {
       picked_movie_id,
 			currMovieGenre,
       handleClickNavMenu,
-      onResetPickImage,
       moviesObj
     }
   },

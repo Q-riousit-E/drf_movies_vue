@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useStore } from 'vuex'
 
 import StarRating from '@/components/StarRating.vue'
@@ -34,18 +34,12 @@ export default {
     StarRating,
     ZingChart
   },
-  setup(props, { emit }) {
+  setup() {
     // Vuex
     const store = useStore()
     const picked_movie = computed(() => store.state.movies.picked_movie)
 
-    // Comm with three
-    const onResetPickImage = () => {
-      emit('onResetPickImage')
-    }
-
     return {
-      onResetPickImage,
       picked_movie
     }
   },

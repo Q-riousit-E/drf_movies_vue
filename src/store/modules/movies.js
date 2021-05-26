@@ -5,7 +5,49 @@ const articlesURL = 'http://localhost:8000/api/v1/articles/'
 
 const state = {
   moviesObj: null,
-  picked_movie: null,
+  picked_movie: {
+    "id": 96,
+    "star_average": 4.3,
+    "simple_rating_counts": {
+      "0.5": 3,
+      "1.0": 0,
+      "1.5": 0,
+      "2.0": 3,
+      "2.5": 4,
+      "3.0": 4,
+      "3.5": 4,
+      "4.0": 8,
+      "4.5": 38,
+      "5.0": 36
+    },
+    "detailed_ratings_average": {
+      "originality_average": 3.6,
+      "plot_average": 4,
+      "characters_average": 3.9,
+      "cinematography_average": 3.1,
+      "music_score_average": 3.8,
+      "entertainment_value_average": 4
+    },
+    "genre_names": [
+      "Comedy",
+      "Fantasy",
+      "Horror",
+      "Science Fiction"
+    ],
+    "adult": false,
+    "title": "The Rocky Horror Picture Show",
+    "overview": "Sweethearts Brad and Janet, stuck with a flat tire during a storm, discover the eerie mansion of Dr. Frank-N-Furter, a transvestite scientist. As their innocence is lost, Brad and Janet meet a houseful of wild characters, including a rocking biker and a creepy butler. Through elaborate dances and rock songs, Frank-N-Furter unveils his latest creation: a muscular man named 'Rocky'.",
+    "poster_path1": "https://image.tmdb.org/t/p/original//3pyE6ZqDbuJi7zrNzzQzcKTWdmN.jpg",
+    "poster_path2": "https://image.tmdb.org/t/p/original//8QCNX4oxfO7xyASvJ0fnTFrqXsC.jpg",
+    "poster_path3": "https://image.tmdb.org/t/p/original//5ycpwyUkYBwm2VFoE3TkP3OtuFw.jpg",
+    "poster_path4": "https://image.tmdb.org/t/p/original//njfcrSFJeJAL5EUJ96AVTIeD7JV.jpg",
+    "trailer_path": "https://youtube.com/embed/4plqh6obZW4",
+    "release_date": "1975-08-14",
+    "director_name": "Jim Sharman",
+    "cast1_name": "Tim Curry",
+    "cast2_name": "Susan Sarandon",
+    "cast3_name": "Barry Bostwick"
+  },
   currMovieGenre: 'sci_fi',
   simpleRating: 0,
   suggested_movies: null,
@@ -25,6 +67,7 @@ const mutations = {
     state.moviesObj = moviesObj
   },
   SET_PICKED_MOVIE(state, movie) {
+    console.log(movie)
     state.picked_movie = movie
   },
   SET_CURR_MOVIE_GENRE(state, currMovieGenre) {

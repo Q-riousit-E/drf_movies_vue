@@ -1,8 +1,9 @@
 <template>
   <div>
-    <transition name="fade">
-      <MainNav v-if="mainNavShow" />
-    </transition>
+    <!-- <transition name="fade"> -->
+    <!-- <MainNav v-if="mainNavShow" /> -->
+    <MainNav />
+    <!-- </transition> -->
   </div>
   <!-- FIX NEEDED: main nav not available when entered from not home -->
   <!-- <router-view @showMainNav="showMainNav" @hideMainNav="hideMainNav" v-slot="{ Component }">
@@ -10,7 +11,8 @@
       <component :is="Component"></component>
     </transition>
   </router-view> -->
-  <router-view @showMainNav="showMainNav" @hideMainNav="hideMainNav" />
+  <!-- <router-view @showMainNav="showMainNav" @hideMainNav="hideMainNav" /> -->
+  <router-view />
 </template>
 
 <script>
@@ -26,14 +28,14 @@ export default defineComponent({
   setup() {
     // hidden navbar for first load
     const mainNavShow = ref(true)
-    const showMainNav = () => {
-			console.log('showmainnav')
-      mainNavShow.value = true
-    }
-    const hideMainNav = () => {
-			console.log('hidemainnav')
-      mainNavShow.value = false
-    }
+    // const showMainNav = () => {
+		// 	console.log('showmainnav')
+    //   mainNavShow.value = true
+    // }
+    // const hideMainNav = () => {
+		// 	console.log('hidemainnav')
+    //   mainNavShow.value = false
+    // }
 
     // custom cursor
     function lerp(start, end, amount) {
@@ -108,7 +110,8 @@ export default defineComponent({
     window.addEventListener('mouseup', mouseup, false);
 
     return {
-      mainNavShow, showMainNav, hideMainNav,
+      mainNavShow, 
+      // showMainNav, hideMainNav,
       Home
     }
   },
