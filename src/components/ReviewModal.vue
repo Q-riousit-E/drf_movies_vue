@@ -154,6 +154,7 @@ export default {
     }
     const handleDeleteHexa = () => {
       store.dispatch('movies/deleteHexa', route.params.movie_id)
+      closeReviewModal()
     }
     const cancelHexaSpanClick = (e) => {
       const hexaSpan = document.querySelector('#hexa-span')

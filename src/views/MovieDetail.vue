@@ -5,7 +5,7 @@
 <!-- Movie Info -->
 <div class="container-fluid movie-info-box d-flex flex-row p-0">
   <div class="movie-poster-div">
-    <img class="movie-poster" :src="picked_movie.poster_path.replace('/original/', '/w500/')" alt="">
+    <img class="movie-poster" :src="picked_movie.poster_path1.replace('/original/', '/w500/')" alt="">
     <StarRatingSubmit @promptLogin="onPromptLogin" :starShakeMotion="starShakeMotion"/>
   </div>
   <div class="movie-general-info-div">

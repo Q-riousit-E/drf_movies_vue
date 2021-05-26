@@ -3,7 +3,7 @@
   <hr class="hr">
   <div class="searched-movie-container d-flex mt-3">
     <div class="w-25">
-      <img :src="movie.poster_path.replace('/original/', '/w342/')" class="searched-movie-img">
+      <img :src="movie.poster_path1.replace('/original/', '/w342/')" class="searched-movie-img">
     </div>
     <div class="searched-movie-info d-flex flex-column align-items-start w-75">
       <h5 class="fw-bold title">{{ movie.title }}</h5>
