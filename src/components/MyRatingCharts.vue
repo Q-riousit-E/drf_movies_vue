@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { computed, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { useStore } from 'vuex'
 
 import zingchart from 'zingchart/zingchart-es6.min.js';

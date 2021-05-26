@@ -105,7 +105,6 @@ export default {
 
       // initial data setting
       setTimeout(() => {
-        console.log(hexaData.value)
         rater1.setRating(hexaData.value.originality)
         rater2.setRating(hexaData.value.plot)
         rater3.setRating(hexaData.value.cinematography)

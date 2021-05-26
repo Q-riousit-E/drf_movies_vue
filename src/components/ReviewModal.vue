@@ -9,12 +9,12 @@
       class="user-info" 
       :class="{ 
         reviewSelected: (!hexaSelected && reviewSelected) || (!hexaDataFromStore && commentDataFromStore), 
-        hexaSelected: (!reviewSelected && hexaSelected) || (hexaDataFromStore && !commentDataFromStore), 
-        bothSelected: (reviewSelected && hexaSelected) || (hexaDataFromStore && commentDataFromStore)
+        hexaSelected: (!reviewSelected && hexaSelected) || (hexaDataFromStore?.originality && !commentDataFromStore), 
+        bothSelected: (reviewSelected && hexaSelected) || (hexaDataFromStore?.originality && commentDataFromStore)
       }"
     >
       <h1><b>{{ decodedToken.username }}</b></h1>
-      <h3>★ x {{ simpleRating }}</h3>
+      <h3><span style="color: orange;">★</span> <b>x {{ simpleRating }}</b></h3>
     </div>
 
     <div class="input-data-group">
@@ -40,8 +40,11 @@
             <!-- input -->
             <div class="w-100 h-100" v-if="reviewSelected">
               <textarea key="1" id="review-input" class="px-4" v-model="commentData"></textarea>
-              <button class="btn btn-primary star-review-btn" v-if="reviewSelected && !hexaSelected" @click="submitComment">Submit Star + Comment</button>
+              <button class="btn btn-secondary star-review-btn" v-if="reviewSelected && !hexaSelected" @click="submitComment">Submit Star + Comment</button>
             </div>
+            <!-- <p style="color: white;">reviewSelected: {{ reviewSelected }}</p>
+            <p style="color: white;">commentData: {{ commentData }}</p>
+            <p style="color: white;">commentDataFromStore: {{ commentDataFromStore }}</p> -->
           </span>
         </label>
       </div>
@@ -67,17 +70,17 @@
             <!-- inputs -->
             <div class="w-100 h-100" v-if="hexaSelected">
               <HexaStarRating @setHexaData="handleGetHexaFromForm" />
-              <button class="btn btn-primary star-review-btn" v-if="hexaSelected && !reviewSelected" @click="handleSubmitHexa">Submit Star + Hexa</button>
+              <button class="btn btn-secondary star-review-btn" v-if="hexaSelected && !reviewSelected" @click="handleSubmitHexa">Submit Star + Hexa</button>
             </div>
-            <p style="color: white;">hexaSelected: {{ hexaSelected }}</p>
+            <!-- <p style="color: white;">hexaSelected: {{ hexaSelected }}</p>
             <p style="color: white;">hexaData: {{ hexaData }}</p>
-            <p style="color: white;">hexaDataFromStore: {{ hexaDataFromStore }}</p>
+            <p style="color: white;">hexaDataFromStore: {{ hexaDataFromStore }}</p> -->
 
           </span>
         </label>
       </div>
     </div>
-    <button class="btn btn-primary star-review-hexa-btn" v-if="reviewSelected && hexaSelected" @click="submitCommentHexa">Submit Star + Comment + Hexa</button>
+    <button class="btn btn-secondary star-review-hexa-btn" v-if="reviewSelected && hexaSelected" @click="submitCommentHexa">Submit Star + Comment + Hexa</button>
   </div>
 </fieldset> 
 </template>
@@ -103,7 +106,9 @@ export default {
     // get data from store 
     const decodedToken = computed(() => store.state.auth.decodedToken)
     const simpleRating = computed(() => store.state.movies.simpleRating)
-    const commentData = ref({
+    const commentData = ref('')
+    const commentDataFromStore = computed(() => store.state.movies.myComment)
+    const hexaData = ref({
       originality: 0,
       plot: 0,
       cinematography: 0,
@@ -111,8 +116,6 @@ export default {
       characters: 0,
       entertainment_value: 0,
     })
-    const commentDataFromStore = computed(() => store.state.movies.myComment)
-    const hexaData = ref(null)
     const hexaDataFromStore = computed(() => store.state.movies.myHexa)
 
     // variables for user-info classes
@@ -161,7 +164,6 @@ export default {
     }
     const cancelHexaSpanClick = (e) => {
       const hexaSpan = document.querySelector('#hexa-span')
-      console.log(e.target)
 
       // if hexaspan is clicked while hexa is selected -> unselect hexa
       if (e.target === hexaSpan) {
@@ -243,13 +245,13 @@ export default {
 
 .rating-group {
   position: absolute;
-  top: 50%;
+  top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
   width: 70vw;
-  height: 70vh;
+  height: 65vh;
   color: black;
 }
 
@@ -280,13 +282,13 @@ export default {
 	white-space: nowrap;
 
 	&:checked + .checkbox-tile {
-		border-color: white;
+		border-color: black;
 		// color: #2260ff;
 		&:before {
 			transform: scale(1);
 			opacity: 1;
 			background-color: #2260ff;
-			border-color: #2260ff;
+			// border-color: #2260ff;
 		}
 		
 		.checkbox-icon, .checkbox-label {
@@ -303,7 +305,7 @@ export default {
   display: block;
 	width: 100%;
   height: 100%;
-	border: 2px solid #b5bfd9;
+	// border: 2px solid #b5bfd9;
 	background-color: #fff;
 	box-shadow: 0 5px 10px rgba(#000, 0.1);
 	transition: 0.15s ease;
@@ -372,25 +374,25 @@ export default {
 
 .icons-holder {
   position: absolute;
-  top: 0;
+  top: -50%;
   display: flex;
   justify-content: space-around;
-  align-items: baseline;
+  align-items: flex-end;
 }
 
 .user-info {
   display: flex;
-  color: black;
+  color: white;
   width: 50%;
   height: 15%;
   text-align: center;
-  background: white;
+  background: rgb(68 68 68);
   margin: 0;
   align-self: center;
   justify-content: space-between;
   align-items: center;
   padding: 0 3rem 0 3rem;
-  border: 1px solid black;
+  border-bottom: 1px solid white;
 }
 
 .reviewSelected {
@@ -421,6 +423,8 @@ export default {
   height: 100%;
   border: none;
   font-size: 2rem;
+  background: #444444;
+  color: #939393;
 }
 
 .star-review-btn {
@@ -450,8 +454,26 @@ export default {
 .former-val-div {
   width: 100%;
   height: 100%;
-  padding: 0 1.5rem 0 1.5rem;
+  padding: 2rem 2rem 2rem 2rem;
   font-size: 2rem;
   text-align: left;
+  color: #939393;
 }
+.former-val-div:hover {
+  border: 1px solid rgb(171, 171, 243);
+}
+
+.icon {
+  color: white;
+}
+
+.edit-icons {
+  font-size: 3rem;
+}
+
+#review-span,
+#hexa-span {
+  background: rgb(68 68 68);
+}
+
 </style>

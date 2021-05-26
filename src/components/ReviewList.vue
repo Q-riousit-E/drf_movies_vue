@@ -39,13 +39,16 @@ export default {
 <style scoped>
 .all-reviews-background {
   width: 100%;
-  /* background-color: rgb(22, 22, 22); */
+  background-color: rgb(53 53 53);
   border-radius: 5px;
   margin: 0;
 }
 
 .review-container {
-  height: 26vh;
+  height: 37vh;
+  position: relative;
+  margin: 0;
+  padding: 0;
   /* background-color: gray; */
 }
 </style>

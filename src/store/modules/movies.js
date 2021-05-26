@@ -251,7 +251,7 @@ const actions = {
         commit('SET_MY_COMMENT', res.data)
       })
       .catch((err) => {
-        commit('SET_MY_COMMENT', null)
+        commit('SET_MY_COMMENT', '')
       })
   },
   updateComment({ commit, rootState }, { movie_id, comment }) {

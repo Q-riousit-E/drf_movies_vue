@@ -1,13 +1,27 @@
 <template>
 <div class="review-inner-container">
-  <div class="user-info-container d-flex justify-content-between align-items-center px-3 py-1">
+  <div class="user-info-container d-flex justify-content-between align-items-center">
     <p><b>{{ userData.username }}</b></p>
-    <p><span style="color: rgb(241 201 71); font-size: 1.2rem;">★</span> x {{ userData.simple_rating }} </p>
+    <p><span style="color: rgb(241 201 71); font-size: 1.2rem;">★</span> <b> x {{ userData.simple_rating }}</b> </p>
   </div>
   <hr class="m-0">
-  <div class="user-rating-container d-flex align-items-center px-3">
-    <div v-if="userData.article" class="comment-section" :class="'cols-'+ colCnt">
-      {{ userData.article.content }}
+  <div class="user-rating-container d-flex align-items-center">
+    <div v-if="userData.article" class="comment-section d-flex flex-column justify-content-between" :class="'cols-'+ colCnt">
+      <p>{{ userData.article.content }}</p>
+      <!-- Likes Section -->
+      <div>
+        <span>
+          <i v-if="userData.comment_count" class="fas fa-thumbs-up"></i>
+          <i v-else class="far fa-thumbs-up"></i>
+          <span>{{ userData.comment_count }}</span>
+        </span>
+        <span class="mx-4">
+          <i v-if="userData.comment_count" class="fas fa-comment-dots"></i>
+          <i v-else class="far fa-comment-dots"></i>
+          <span>{{ userData.comment_count }}</span>
+        </span>
+      </div>
+
     </div>
     <div v-if="userData.detailed?.originality" class="hexa-section" :class="'cols-'+ colCnt">
       <HexaStarReview :userData="userData"/>
@@ -63,23 +77,35 @@ export default {
 <style scoped>
 .review-inner-container {
   margin: 2vh;
-  border: 1px solid black;
-  background-color: rgb(68, 68, 68);
+  background-color: rgb(68 68 68);
+  border-radius: 5px;
+  height: 32vh;
+  -webkit-box-shadow: 0px 8px 24px 5px rgba(0,0,0,0.27); 
+  box-shadow: 0px 8px 24px 5px rgba(0,0,0,0.27);
 }
 
 .user-info-container {
   /* border: 1px solid black; */
+  color: white;
+  padding: 1rem 2rem 1rem 2rem;
+}
+
+.user-rating-container {
+  padding: 0.4rem 2rem 0 2rem;
 }
 
 .comment-section {
+  padding-top: 1rem;
   width: 50%;
-  height: 20vh;
+  height: 22vh;
+  color: white;
+  overflow-y: auto;
   /* border: 1px solid black; */
 }
 
 .hexa-section {
   width: 50%;
-  height: 20vh;
+  height: 22vh;
   /* border: 1px solid black; */
 }
 

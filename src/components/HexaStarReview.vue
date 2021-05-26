@@ -41,13 +41,14 @@ export default {
     const store = useStore()
     const userData = computed(() => props.userData)
     let rater1, rater2, rater3, rater4, rater5, rater6
+    let starSize = 13
 
     onMounted(() => {
       // give diffrent classname to each rater for identification
       rater1 = rater({
         element:document.querySelector(`#rater1-${userData.value.user_id}`),
         readOnly: true,
-        starSize: 10,
+        starSize: starSize,
         step: 0.5,
         rateCallback:function rateCallback(rating, done) {
           done() 
@@ -56,7 +57,7 @@ export default {
       rater2 = rater({
         element:document.querySelector(`#rater2-${userData.value.user_id}`),
         readOnly: true,
-        starSize: 10,
+        starSize: starSize,
         step: 0.5,
         rateCallback:function rateCallback(rating, done) {
           done() 
@@ -65,7 +66,7 @@ export default {
       rater3 = rater({
         element:document.querySelector(`#rater3-${userData.value.user_id}`),
         readOnly: true,
-        starSize: 10,
+        starSize: starSize,
         step: 0.5,        
         rateCallback:function rateCallback(rating, done) {
           done() 
@@ -74,7 +75,7 @@ export default {
       rater4 = rater({
         element:document.querySelector(`#rater4-${userData.value.user_id}`),
         readOnly: true,
-        starSize: 10,
+        starSize: starSize,
         step: 0.5,        
         rateCallback:function rateCallback(rating, done) {
           emit('setHexaData', {rater:'music_score', value: rating})
@@ -84,7 +85,7 @@ export default {
       rater5 = rater({
         element:document.querySelector(`#rater5-${userData.value.user_id}`),
         readOnly: true,
-        starSize: 10,
+        starSize: starSize,
         step: 0.5,        
         rateCallback:function rateCallback(rating, done) {
           done() 
@@ -93,7 +94,7 @@ export default {
       rater6 = rater({
         element:document.querySelector(`#rater6-${userData.value.user_id}`),
         readOnly: true,
-        starSize: 10,
+        starSize: starSize,
         step: 0.5,        
         rateCallback:function rateCallback(rating, done) {
           done() 
@@ -124,14 +125,14 @@ export default {
 }
 
 .star-container {
-  margin: auto;
+  margin-bottom: 1rem;
   padding: 0;
   text-align: center;
 }
 
 .star-container div {
   font-size: 0.9rem;
-  color: rgb(160, 157, 157);
+  color: rgb(188 188 188);
 }
 
 /* .star-rating {
@@ -144,6 +145,7 @@ export default {
 
 .star-rating .star-value  {
   background: url('~@/assets/full_star3.svg');
+  margin-bottom: 1rem;
   /* background-repeat: repeat-x;
   position: absolute;
   height: 100%;
