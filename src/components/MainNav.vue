@@ -300,6 +300,11 @@ export default {
 
 .my-brand {
   padding-left: 3vw;
+  transition: all 1s;
+}
+
+.my-brand:hover {
+  transform: scale(1.1);
 }
 
 .auth-btn {
