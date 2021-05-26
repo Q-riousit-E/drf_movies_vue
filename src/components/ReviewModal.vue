@@ -40,7 +40,7 @@
             <!-- input -->
             <div class="w-100 h-100" v-if="reviewSelected">
               <textarea key="1" id="review-input" class="px-4" v-model="commentData"></textarea>
-              <button class="btn btn-secondary star-review-btn" v-if="reviewSelected && !hexaSelected" @click="submitComment">Submit Star + Comment</button>
+              <button class="btn btn-secondary star-review-btn" v-if="reviewSelected && !hexaSelected" @click="submitComment">Submit Comment</button>
             </div>
             <!-- <p style="color: white;">reviewSelected: {{ reviewSelected }}</p>
             <p style="color: white;">commentData: {{ commentData }}</p>
@@ -70,7 +70,7 @@
             <!-- inputs -->
             <div class="w-100 h-100" v-if="hexaSelected">
               <HexaStarRating @setHexaData="handleGetHexaFromForm" />
-              <button class="btn btn-secondary star-review-btn" v-if="hexaSelected && !reviewSelected" @click="handleSubmitHexa">Submit Star + Hexa</button>
+              <button class="btn btn-secondary star-review-btn" v-if="hexaSelected && !reviewSelected" @click="handleSubmitHexa">Submit Hexa</button>
             </div>
             <!-- <p style="color: white;">hexaSelected: {{ hexaSelected }}</p>
             <p style="color: white;">hexaData: {{ hexaData }}</p>
@@ -80,7 +80,7 @@
         </label>
       </div>
     </div>
-    <button class="btn btn-secondary star-review-hexa-btn" v-if="reviewSelected && hexaSelected" @click="submitCommentHexa">Submit Star + Comment + Hexa</button>
+    <button class="btn btn-secondary star-review-hexa-btn" v-if="reviewSelected && hexaSelected" @click="submitCommentHexa">Submit Comment + Hexa</button>
   </div>
 </fieldset> 
 </template>
