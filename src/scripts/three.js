@@ -1084,7 +1084,7 @@ function main(progressCount, movieObjs, isVisible, loadingThree, picked_movie_id
   window.addEventListener('mouseup', onCanvasMouseUp, false);
   canvas.addEventListener('mousedown', onCanvasMouseDown, false)
   window.addEventListener('mousemove', onCanvasMouseMove, false)
-  window.addEventListener('mousewheel', onCanvasScroll, false)
+  canvas.addEventListener('mousewheel', onCanvasScroll, false)
 }
 
 export { main }
