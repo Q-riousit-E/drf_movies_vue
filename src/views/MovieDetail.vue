@@ -10,7 +10,10 @@
   </div>
   <div class="movie-general-info-div">
     <div class="movie-general-info-inner-div">
-      <h3>{{ picked_movie.title }} <span class="btn btn-primary" @click="handleOpenReviewModal">Write Review</span></h3>
+      <div class="d-flex justify-content-between">
+      <p class="h3" style="display: inline-block">{{ picked_movie.title }}</p>
+      <span class="btn btn-primary" @click="handleOpenReviewModal">Write Review</span>
+      </div>
       <p class="movie-year"><b>{{ picked_movie.release_date.substring(0, 4) }}</b></p>
       <span class="hashtags" v-for="(genre, idx) in picked_movie.genre_names" :key="idx" v-text="genre"></span>
       <!-- FIX NEEDED: cut sentence with a whole word -->
