@@ -458,6 +458,8 @@ export default {
   font-size: 2rem;
   text-align: left;
   color: #939393;
+  overflow-wrap: break-word;
+  overflow-y: auto;
 }
 .former-val-div:hover {
   border: 1px solid rgb(171, 171, 243);

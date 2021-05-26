@@ -100,6 +100,7 @@ export default {
   height: 22vh;
   color: white;
   overflow-y: auto;
+  overflow-wrap: break-word;
   /* border: 1px solid black; */
 }
 

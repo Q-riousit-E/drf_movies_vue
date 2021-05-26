@@ -12,7 +12,6 @@
     <div class="movie-general-info-inner-div">
       <div class="d-flex justify-content-between">
       <p class="h3" style="display: inline-block">{{ picked_movie.title }}</p>
-      <span class="btn btn-primary" @click="handleOpenReviewModal">Write Review</span>
       </div>
       <p class="movie-year"><b>{{ picked_movie.release_date.substring(0, 4) }}</b></p>
       <span class="hashtags" v-for="(genre, idx) in picked_movie.genre_names" :key="idx" v-text="genre"></span>
@@ -24,6 +23,7 @@
       <h5>Cast / Crew</h5>
       <p><span class="role-span">Director : </span>{{ picked_movie.director_name || "N/A" }}</p>
       <p><span class="role-span">Cast : </span>{{ (picked_movie.cast1_name ?  picked_movie.cast1_name : "N/A") + (picked_movie.cast2_name ? ", " : "") }}{{ (picked_movie.cast2_name ? picked_movie.cast2_name : "") + (picked_movie.cast3_name ? ", " : "") }}{{ picked_movie.cast3_name || "" }}</p> 
+      <!-- NEEDS MORE SCRAPING -->
       <p><span class="role-span">Subscription : </span> Netflix</p>     
       <hr>
 
@@ -33,7 +33,11 @@
       <hr>
 
       <!-- Reviews -->
-      <h5 class="mb-3">Reviews</h5>
+      <div class="d-flex justify-items-between align-items-center w-100">
+        <h5 class="mb-3">Reviews</h5>
+        <span class="add-review-span btn btn-secondary" @click="handleOpenReviewModal"><i class="far fa-plus-square"></i> Add a Review</span>
+      </div>
+    
       <ReviewList />
 
     </div>
@@ -64,9 +68,6 @@ import DetailedReviews from '@/components/DetailedReviews.vue'
 import ReviewList from '@/components/ReviewList.vue'
 
 import ReviewModal from '@/components/ReviewModal.vue'
-
-
-
 
 export default {
   name: 'Movies',
@@ -239,5 +240,11 @@ export default {
 
 .review-span {
   color: cornflowerblue;
+}
+
+.add-review-span {
+  margin-left: 3rem;
+  cursor: pointer;
+  font-size: 1rem;
 }
 </style>
