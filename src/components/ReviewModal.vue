@@ -1,5 +1,5 @@
 <template>
-<fieldset class="checkbox-group" @click="closeReviewModal">
+<fieldset class="checkbox-group" @click="handleCloseReviewModal">
 	<!-- <legend class="checkbox-group-legend">Choose your favorites</legend> -->
 
   <div class="rating-group">
@@ -12,32 +12,33 @@
       <h1><b>{{ decodedToken.username }}</b></h1>
       <h3>★ x {{ simpleRating }}</h3>
     </div>
-    <button v-if="!reviewSelected && !hexaSelected" @click="submitStar" class="btn btn-primary star-rating-btn">Submit Star Rating</button>
 
     <div class="input-data-group">
+
       <!-- Review -->
       <div id="reviewGroup" class="checkbox">
         <label class="checkbox-wrapper">
-          <input type="checkbox" class="checkbox-input" v-model="reviewSelected" />
-          <!-- <span id="review-span" class="checkbox-tile" @click="toggleReviewSelected"> -->
+          <input id="review-checkbox" type="checkbox" class="checkbox-input" v-model="reviewSelected" />
           <span id="review-span" class="checkbox-tile">
             <!-- btns -->
             <div id="review-btn-container" class="checkbox-label w-100 h-100" v-if="!reviewSelected">
-              <i class="icon fas fa-plus" v-if="!reviewData"></i>
-              <div v-else>
-                <i class="icon fas fa-edit edit-center"></i>
-                <div class="px-4 w-100 h-100" v-text="reviewData"></div>
+              <i class="icon fas fa-plus" v-if="!commentDataFromStore"></i>
+              <div class="w-100 h-100" v-else>
+                <!-- formerly Written review -->
+                <div class="former-val-div" v-text="commentDataFromStore.content"></div>
+                <div class="icons-holder w-100 h-100">
+                  <i class="icon edit-icons fas fa-edit"></i>
+                  <i class="icon edit-icons fas fa-eraser" @click="handleDeleteComment"></i>
+                </div>
               </div>
 
             </div>
 
             <!-- input -->
             <div class="w-100 h-100" v-if="reviewSelected">
-              <textarea id="review-input" class="px-4" v-if="!reviewData"></textarea>
-              <textarea id="review-input" class="px-4" v-else v-model="reviewData"></textarea>
+              <textarea key="1" id="review-input" class="px-4" v-model="commentData"></textarea>
               <button class="btn btn-primary star-review-btn" v-if="reviewSelected && !hexaSelected" @click="submitComment">Submit Star + Comment</button>
             </div>
-
           </span>
         </label>
       </div>
@@ -46,21 +47,28 @@
       <div id="hexaGroup" class="checkbox">
         <label class="checkbox-wrapper">
           <input type="checkbox" class="checkbox-input" v-model="hexaSelected" />
-          <!-- <span id="hexa-span" class="checkbox-tile" @click="toggleHexaSelected"> -->
-          <span id="hexa-span" class="checkbox-tile">
+          <span id="hexa-span" class="checkbox-tile" @click="cancelHexaSpanClick">
             <!-- btns -->
-            <div id="hexa-btn-container" class="checkbox-label" v-if="!hexaSelected">
-              <i class="icon fas fa-plus" v-if="!hexaData"></i>
-              <i class="icon fas fa-edit" v-else></i>
-
-              <!-- <span class="checkbox-label"><i class="icon far fa-edit"></i></span> -->
+            <div id="hexa-btn-container" class="checkbox-label w-100 h-100" v-if="!hexaSelected">
+              <i class="icon fas fa-plus" v-if="!hexaDataFromStore"></i>
+              <div class="w-100 h-100" v-else>
+                <!-- formerly Written review -->
+                <HexaStarRating />
+                <div class="icons-holder w-100 h-100">
+                  <i class="icon edit-icons fas fa-edit"></i>
+                  <i class="icon edit-icons fas fa-eraser" @click="handleDeleteHexa"></i>
+                </div>
+              </div>
             </div>
 
             <!-- inputs -->
             <div class="w-100 h-100" v-if="hexaSelected">
-              <input id="review-input" />
-              <button class="btn btn-primary star-hexa-btn" v-if="!reviewSelected && hexaSelected" @click="submitHexa">Submit Star + Hexa</button>
+              <HexaStarRating @setHexaData="handleGetHexaFromForm" />
+              <button class="btn btn-primary star-review-btn" v-if="hexaSelected && !reviewSelected" @click="submitHexa">Submit Star + Hexa</button>
             </div>
+            <p style="color: white;">hexaSelected: {{ hexaSelected }}</p>
+            <p style="color: white;">hexaData: {{ hexaData }}</p>
+            <p style="color: white;">hexaDataFromStore: {{ hexaDataFromStore }}</p>
 
           </span>
         </label>
@@ -72,60 +80,107 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
+import { useRoute } from 'vue-router'
+
+import HexaStarRating from '@/components/HexaStarRating.vue'
 
 export default {
   name: 'ReviewModal',
+  components: {
+    HexaStarRating
+  },
   emits: ['closeReviewModal'],
   setup(props, { emit }) {
     // init
     const store = useStore()
+    const route = useRoute()
 
     // get data from store 
     const decodedToken = computed(() => store.state.auth.decodedToken)
     const simpleRating = computed(() => store.state.movies.simpleRating)
-    const reviewData = ref('이 영화 진짜 노잼')
-    const hexaData = ref({plot: 3, cinematograpy: 4, originality: 5})  // dummy for testing
+    const commentData = ref('')
+    const commentDataFromStore = computed(() => store.state.movies.myComment)
+    const hexaData = ref(null)
+    const hexaDataFromStore = computed(() => store.state.movies.myHexa)
 
     // variables for user-info classes
     const reviewSelected = ref(false)
     const hexaSelected = ref(false)
 
     // Close Add modal on click background
-    const closeReviewModal = (e) => {
+    const closeReviewModal = () => {
+      emit('closeReviewModal')
+    }
+    const handleCloseReviewModal = (e) => {
       const reviewModalBackground = document.querySelector('.checkbox-group')
       if (e.target === reviewModalBackground) {
-        emit('closeReviewModal')
+        closeReviewModal()
       }
     }
 
     //// Submit reviews
-    // 1. just star
-    const submitStar = () => {
-      console.log('submit star')
-    }
-
-    // 2. star + comment
+    // 1. star + comment
     const submitComment = () => {
-      console.log('submit comment:', reviewData.value)
+      // const reviewSpan = document.querySelector('#review-span')
+      console.log('submit comment:', commentData.value)
+      store.dispatch('movies/updateComment', {movie_id: route.params.movie_id, comment: commentData.value})
+      // console.log(reviewSpan)
+      closeReviewModal()
+    }
+    const handleDeleteComment = (e) => {
+      e.preventDefault()
+      console.log(e.target)
+      store.dispatch('movies/deleteComment', route.params.movie_id)
+      closeReviewModal()
     }
 
-    // 3. star + hexa
+    // 2. star + hexa
     const submitHexa = () => {
-      console.log('submit star + hexa')
+      console.log('submit star + hexa', hexaData.value)
+    }
+    const handleGetHexaFromForm = (data) => {
+      hexaData.value[data.rater] = data.value
+    }
+    const cancelHexaSpanClick = (e) => {
+      if (hexaSelected.value) {
+        e.preventDefault()
+      }
+      console.log(e.target)
     }
 
-    // 4. star + comment + hexa
+
+    // 3. star + comment + hexa
     const submitCommentHexa = () => {
       console.log('submit star + comment + hexa')
     }
+
+    // onMounted
+    onMounted(() => {
+      // initialize data values
+      if (commentDataFromStore.value) {
+        commentData.value = commentDataFromStore.value.content
+      } else {
+        commentData.value = ''
+      }
+      if (hexaDataFromStore.value) {
+        hexaData.value = {...hexaDataFromStore.value}
+      } else {
+        hexaData.value = null
+      }
+    })
     
     return {
-      decodedToken, simpleRating, reviewData, hexaData,
+      decodedToken, simpleRating, 
+      commentData, hexaData,
+      commentDataFromStore, hexaDataFromStore,
       reviewSelected, hexaSelected,
-      closeReviewModal,
-      submitStar, submitComment, submitHexa, submitCommentHexa
+      handleCloseReviewModal,
+      submitComment, 
+      handleGetHexaFromForm, cancelHexaSpanClick, submitHexa,
+      submitCommentHexa,
+      handleDeleteComment,
     }
   }
 }
@@ -287,6 +342,18 @@ export default {
   transform: translateY(-50%);
 }
 
+.icon:hover {
+  color: #2260ff;
+}
+
+.icons-holder {
+  position: absolute;
+  top: 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: baseline;
+}
+
 .user-info {
   display: flex;
   color: black;
@@ -354,5 +421,13 @@ export default {
 .edit-center {
   position: absolute;
   
+}
+
+.former-val-div {
+  width: 100%;
+  height: 100%;
+  padding: 0 1.5rem 0 1.5rem;
+  font-size: 2rem;
+  text-align: left;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <MovieInfoBox @onResetPickImage="onResetPickImage" v-if="true"/>
+  <!-- <MovieInfoBox @onResetPickImage="onResetPickImage" v-if="true"/> -->
   <!-- <div class="wrap" v-if="false">
     <div class="bg">
       <div class="loading">
@@ -14,19 +14,22 @@
 		<RadarChart />
 		<ZingChart />
 	</div> -->
+	<HexaStarRating />
 </template>
 
 <script>
 import MovieInfoBox from '@/components/MovieInfoBox.vue'
 import RadarChart from '@/components/RadarChart.vue'
 import ZingChart from '@/components/ZingChart.vue'
+import HexaStarRating from '@/components/HexaStarRating.vue'
 
 export default {
   name: 'Testing',
   components: {
     MovieInfoBox,
 		RadarChart,
-		ZingChart
+		ZingChart,
+		HexaStarRating
   },
   setup() {
     const onResetPickImage = () => {

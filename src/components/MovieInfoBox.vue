@@ -9,12 +9,11 @@
     <hr>
     <p><span class="role-span">Director : </span>{{ picked_movie.director_name || "N/A" }}</p>
     <p><span class="role-span">Cast : </span>{{ (picked_movie.cast1_name ?  picked_movie.cast1_name : "N/A") + (picked_movie.cast2_name ? ", " : "") }}{{ (picked_movie.cast2_name ? picked_movie.cast2_name : "") + (picked_movie.cast3_name ? ", " : "") }}{{ picked_movie.cast3_name || "" }}</p> 
-    <p><span class="role-span">Subscription : </span> Netflix</p> 
     <hr>
     <router-link :to="{ name: 'MovieDetail', params: { movie_id: picked_movie.id }}" class="detail-link text-decoration-none"><span class="review-span">Details</span></router-link> 
   </div>
   <div class="movie-ratings d-flex flex-column">
-    <div class="d-flex justify-content-center">
+    <div class="d-flex justify-content-center" style="margin-top: 0.8rem;">
       <StarRating :rating="picked_movie.vote_average"/>
     </div>
     <ZingChart />
@@ -60,6 +59,7 @@ export default {
 .movie-info-box {
   /* background: rgb(255, 255, 255, 0.7); */
   background: rgb(0, 0, 0, 0.7);
+  display: block;
   position: fixed;
   z-index: 50;
   left: 50%;
@@ -83,13 +83,14 @@ export default {
 
 .movie-general-info-div {
   width: 30vw;
-  padding: 2vw;
+  padding: 3vw;
 }
 
 .movie-ratings {
   width: 20vw;
   padding: 2vw;
   padding-right: 3vw;
+  padding-top: 3.8vw;
 }
 
 .checked {
@@ -132,4 +133,8 @@ export default {
 /* .review-a {
   line-decoration: none;
 } */
+
+.detail-link {
+  font-size: 1.5rem;
+}
 </style>

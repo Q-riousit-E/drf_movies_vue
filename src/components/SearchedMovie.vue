@@ -34,17 +34,8 @@ export default {
     const route = useRoute()
     const movie = computed(() => props.movie)
 
-    // reload if different params
-    watch(() => route.params, (to, from) => {
-      console.log(to, from)
-      if (to !== from) {
-        location.reload()
-      }
-    })
-
     const goToMovieDetail = () => {
       console.log('clicked movie')
-      console.log(route.params)
       router.push({ name: 'MovieDetail', params: {movie_id: movie.value.id} })
     }
 

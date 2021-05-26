@@ -14,18 +14,30 @@
           <!-- Search (center)-->
           <input type="checkbox" id="check">
           <div class="search-box">
-            <input id="search-input" type="text" placeholder="try #action..!">
+            <input id="search-input" type="text" placeholder="Try 'movie name' or '#genre'">
             <label class="search-label" for="check"><i class="fas fa-search search-icon"></i></label>
             <div class="x-icon invisible"><i class="fas fa-times-circle"></i></div>
             <div class="spinner-icon invisible"><i class="fas fa-spinner fa-spin"></i></div>
           </div>
           <div class="my-popover invisible">
-            <!-- <hr class="popover-hr"> -->
-            <SearchedMovie 
-              v-for="(movie, idx) in searchedMovies" 
-              :key="idx" 
-              :movie="movie"
-            />
+            <div v-if="!searchedMovies.length">
+              <hr style="background-color: #fff;" class="m-0 mb-2">
+              <h5 style="color: white; margin: 0">Try These Movies</h5>
+              <SearchedMovie 
+                v-for="(movie, idx) in suggestedMovies" 
+                :key="idx" 
+                :movie="movie"
+              />
+            </div>
+            <div v-else>
+              <hr style="background-color: #fff;" class="m-0 mb-2">
+              <h5 style="color: white; margin: 0">Seach Results</h5>
+              <SearchedMovie 
+                v-for="(movie, idx) in searchedMovies" 
+                :key="idx" 
+                :movie="movie"
+              />
+            </div>
           </div>
 
           <!-- accounts (right) -->
@@ -70,6 +82,8 @@
     @changeToSignup="handleChangeToSignup"
     @changeToLogin="handleChangeToLogin"
   />
+  <!-- <p style="color: white">{{ suggestedMovies }}</p>
+  <p style="color: gray">{{ searchedMovies }}</p> -->
 </div>
 </template>
 
@@ -123,6 +137,15 @@ export default {
     // Search Movies
     const searchedMovies = ref([])
 
+    // get Suggested Movies on load
+    const suggestedMovies = computed(() => {
+      const movies = []
+      for (let idx in store.state.movies.suggested_movies) {
+        movies.push(store.state.movies.suggested_movies[idx])
+      }
+      return movies
+    })
+
     onMounted(() => {
       // Grab elements
       const searchInput = document.querySelector("#search-input");
@@ -131,18 +154,22 @@ export default {
       const xIconDiv = document.querySelector(".x-icon");
       const spinnerIcondiv = document.querySelector(".spinner-icon");
 
+
       // clicking searchLabel focuses searchInput
       searchLabel.addEventListener("click", () => {
+        // Get Suggested Movies on click (REPEATED BUT WORKS FOR NOW)
+        store.dispatch('movies/get_suggested_movies')
         searchInput.focus();
       });
 
       // focus and focusout events on searchInput
       searchInput.addEventListener("focus", () => {
-        if (searchedMovies.value.length) {
-          myPopover.classList.add("show-popover");
-          myPopover.classList.remove("invisible");
-          searchInput.classList.add("input-with-popover");
-        }
+        myPopover.classList.add("show-popover");
+        myPopover.classList.remove("invisible");
+        searchInput.classList.add("input-with-popover")
+        setTimeout(() => {
+          showSearchResults(suggestedMovies.value, true)
+        }, 1000)
       });
       searchInput.addEventListener("focusout", () => {
         // use setTimeOut so a tag redirecting works for searched items
@@ -186,12 +213,14 @@ export default {
           if (e.target.value) {
             searchRequest(e.target.value);
           } else {
-            myPopover.classList.remove("show-popover");
-            myPopover.classList.add("invisible");
-            searchInput.classList.remove("input-with-popover");
-            xIconDiv.classList.add("invisible");
-            spinnerIcondiv.classList.add("invisible");
-            searchLabel.classList.remove("invisible");
+            searchedMovies.value = []
+            showSearchResults(suggestedMovies.value, true)
+            // myPopover.classList.remove("show-popover");
+            // myPopover.classList.add("invisible");
+            // searchInput.classList.remove("input-with-popover");
+            // xIconDiv.classList.add("invisible");
+            // spinnerIcondiv.classList.add("invisible");
+            // searchLabel.classList.remove("invisible");
           }
         }, 500);
       })
@@ -205,7 +234,7 @@ export default {
           params: {'q': query},
         })
           .then((res) => {
-            showSearchResults(res.data)
+            showSearchResults(res.data, false)
           })
           .catch((err) => {
             console.log(err)
@@ -213,9 +242,11 @@ export default {
       }
 
       // show Search Results
-      function showSearchResults(data) {
-        console.log(data)
-        searchedMovies.value = data
+      function showSearchResults(data, isSuggestion) {
+        console.log(data, isSuggestion)
+        if (!isSuggestion) {
+          searchedMovies.value = data
+        }
 
         // show myPopover
         if (data.length) {
@@ -246,7 +277,10 @@ export default {
       handleLogout,
       
       // search bar
-      searchedMovies
+      searchedMovies,
+
+      // suggested movies
+      suggestedMovies
     }
   },
 }

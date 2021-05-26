@@ -1,8 +1,7 @@
 <template>
   <div class="rating-container">
     <div class="start-rating-container">
-      <img src="/tmdb_logo.jpg" alt="" class="tmdb-logo mb-1">
-      <p>{{ rating }}</p>
+      <!-- <h4><b>{{ rating }}</b></h4> -->
       <div class="Stars" :style="`--rating: ${rating};`" aria-label="Rating of this product is 2.3 out of 5."></div>
     </div>
   </div>
@@ -17,7 +16,8 @@ export default {
   },
   setup(props) {
     const rating = computed(() => {
-      return props.rating/2
+      console.log('this the right place')
+      return props.rating
     })
 
     return {
@@ -27,7 +27,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .rating-container {
   display: flex;
   justify-content: space-around;
@@ -39,14 +39,8 @@ export default {
   align-items: center;
 }
 
-.tmdb-logo {
-  width: 6vh;
-  height: 6vh;
-  border-radius: 10%;
-}
-
 :root {
-  --star-size: 1rem;
+  --star-size: 2rem;
   --star-color: #fff;
   --star-background: rgb(14, 115, 149);
 }
@@ -55,7 +49,7 @@ export default {
   --percent: calc(var(--rating) / 5 * 100%);
   
   display: inline-block;
-  font-size: var(--star-size);
+  font-size: 2rem;
   font-family: Times; // make sure ★ appears correctly
   line-height: 1;
   

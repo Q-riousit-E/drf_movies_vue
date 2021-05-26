@@ -6,42 +6,43 @@
 <div class="container-fluid movie-info-box d-flex flex-row p-0">
   <div class="movie-poster-div">
     <img class="movie-poster" :src="picked_movie.poster_path.replace('/original/', '/w500/')" alt="">
-    <StarRatingSubmit @promptLogin="onPromptLogin"/>
+    <StarRatingSubmit @promptLogin="onPromptLogin" :starShakeMotion="starShakeMotion"/>
   </div>
   <div class="movie-general-info-div">
     <div class="movie-general-info-inner-div">
-      <h3>{{ picked_movie.title }}</h3>
+      <h3>{{ picked_movie.title }} <span class="btn btn-primary" @click="handleOpenReviewModal">Write Review</span></h3>
       <p class="movie-year"><b>{{ picked_movie.release_date.substring(0, 4) }}</b></p>
       <span class="hashtags" v-for="(genre, idx) in picked_movie.genre_names" :key="idx" v-text="genre"></span>
       <!-- FIX NEEDED: cut sentence with a whole word -->
-      <p class="movie-overview mt-4">{{ picked_movie.overview.substring(0, 600) }}</p>
-      
+      <p class="movie-overview mt-4">{{ picked_movie.overview.substring(0, 600) }}</p>    
       <hr>
 
       <!-- Cast / Crew -->
       <h5>Cast / Crew</h5>
       <p><span class="role-span">Director : </span>{{ picked_movie.director_name || "N/A" }}</p>
       <p><span class="role-span">Cast : </span>{{ (picked_movie.cast1_name ?  picked_movie.cast1_name : "N/A") + (picked_movie.cast2_name ? ", " : "") }}{{ (picked_movie.cast2_name ? picked_movie.cast2_name : "") + (picked_movie.cast3_name ? ", " : "") }}{{ picked_movie.cast3_name || "" }}</p> 
-      <p><span class="role-span">Subscription : </span> Netflix</p> 
-      
+      <p><span class="role-span">Subscription : </span> Netflix</p>     
       <hr>
 
       <!-- Ratings -->
       <h5 class="mb-3">Ratings</h5>
       <MyRatingCharts />
-
       <hr>
 
       <!-- Reviews -->
-      <h5>Reviews</h5>
-      <ReviewCard v-for="(review, idx) in reviews" :key="idx" :review="review" />
+      <h5 class="mb-3">Reviews <span>+ Add Review</span></h5>
     </div>
   </div>
+  <!-- Add Review and Hexa Rating -->
+  <ReviewModal 
+    v-if="reviewModalOpened"
+    @closeReviewModal="handleCloseReviewModal"
+  />
 </div>
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
 
@@ -51,7 +52,11 @@ import StarRatingSubmit from '@/components/StarRatingSubmit.vue'
 import ZingChart from '@/components/ZingChart.vue'
 import MyRatingCharts from '@/components/MyRatingCharts.vue'
 
-import ReviewCard from '@/components/ReviewCard.vue'
+import SimpleReviews from '@/components/SimpleReviews.vue'
+import DetailedReviews from '@/components/DetailedReviews.vue'
+
+import ReviewModal from '@/components/ReviewModal.vue'
+
 
 export default {
   name: 'Movies',
@@ -60,13 +65,23 @@ export default {
     StarRatingSubmit,
     ZingChart,
     MyRatingCharts,
-    ReviewCard
+    SimpleReviews,
+    DetailedReviews,
+    ReviewModal
   },
   setup() {
     // dummy reviews for tesing
-    const reviews = ref(['this movie sucks', 'soso', 'best movie ever'])
+    // const reviews = ref(['this movie sucks', 'soso', 'best movie ever', 'asdfasdfa', 'qwerqwerq', 'hiqwienaf', 'adlsifqw'])
     const store = useStore()
     const route = useRoute()
+
+    // reload if different params
+    watch(() => route.params, (to, from) => {
+      console.log(to, from)
+      if (to !== from) {
+        location.reload()
+      }
+    })
 
     // Login Modal
     const onPromptLogin = () => {
@@ -80,11 +95,48 @@ export default {
     }
     changePicked_movie()
 
+    // Get Comments Info
+    const getMyRatings = () => {
+      store.dispatch('movies/getMyComment', route.params.movie_id)
+    }
+    getMyRatings()
+
+    // Get Hexa Rating Info
+    const getMyHexa = () => {
+      store.dispatch('movies/getMyHexa', route.params.movie_id)
+    }
+    getMyHexa()
+
+    // Show Add Review
+    const mySimpleRatingFromStore = computed(() => store.state.movies.simpleRating)
+    const reviewModalOpened = ref(false)
+    const starShakeMotion = ref(false)
+
+    const handleOpenReviewModal = () => {
+      console.log(mySimpleRatingFromStore.value)
+      if (mySimpleRatingFromStore.value !== 0) {
+        reviewModalOpened.value = true
+      } else {
+        console.log('MESSAGE: please rate movie to write a review')
+        starShakeMotion.value = true
+        setTimeout(() => {
+          starShakeMotion.value = false
+        }, 500)
+      }
+    }
+    const handleCloseReviewModal = () => {
+      console.log('closeReviewModal')
+      reviewModalOpened.value = false
+    }
+
     return {
       onPromptLogin,
-      reviews,
       picked_movie,
 
+      // Review Modal
+      reviewModalOpened, handleOpenReviewModal, handleCloseReviewModal,
+
+      starShakeMotion,
     }
   }
 }

@@ -4,7 +4,7 @@
       <p class="my-rating-p" v-if="!mySimpleRatingFromStore">Rate This Movie</p>
       <p class="my-rating-p-rated" v-else>You rated this movie {{ mySimpleRatingFromStore === 1 ? mySimpleRatingFromStore + " star" : mySimpleRatingFromStore + " stars" }}</p>
     </transition>
-    <div id="rater"></div>
+    <div id="rater" class="star-rating" :class="{starShake: starShakeClass}"></div>
     <transition name="fade">
       <button class="cancel-rating-btn" v-if="mySimpleRatingFromStore && decodedToken" @click="simpleRatingDelete" @mouseover="showDeleteMessage" @mouseleave="onCancelMouseLeave">x</button>
     </transition>
@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
 
@@ -20,12 +20,24 @@ import rater from 'rater-js'
 
 export default {
   name: 'StarRatingSubmit',
+  props: ['starShakeMotion'],
   emits: ['promptLogin'],
   setup(props, { emit }) {
     // init
     const store = useStore()
     const route = useRoute()
     const decodedToken = computed(() => store.state.auth.decodedToken)
+
+    //// StarShake
+    const starShakeClass = ref(false)
+    watch(() => props.starShakeMotion, () => {
+      if (props.starShakeMotion) {
+        starShakeClass.value = true
+        setTimeout(() => {
+          starShakeClass.value = false
+        }, 1000)
+      }
+    })
     
     // Login
     const promptLogin = () => {
@@ -123,7 +135,8 @@ export default {
       decodedToken,
       mySimpleRatingFromStore,
       simpleRatingDelete,
-      showDeleteMessage, onCancelMouseLeave
+      showDeleteMessage, onCancelMouseLeave,
+      starShakeClass
     }
   }
 }
@@ -181,5 +194,12 @@ export default {
 .slide-enter-active, 
 .slide-leave-actice {
   transition: all 0.3s ease-in;
+}
+
+/* Star Shake Motion */
+.starShake {
+  animation: shake;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
 }
 </style>

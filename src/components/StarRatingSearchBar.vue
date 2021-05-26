@@ -15,7 +15,7 @@ export default {
   },
   setup(props) {
     const rating = computed(() => {
-      return props.rating/2
+      return props.rating
     })
 
     return {

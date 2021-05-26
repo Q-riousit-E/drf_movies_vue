@@ -640,6 +640,7 @@ function main(progressCount, movieObjs, isVisible, loadingThree, picked_movie_id
 
   // change background according to genre
   function changeBackground() {
+    const sceneChangeDuration = 2
     // reset other scene flags
     romanceFlag = false
     horrorFlag = false
@@ -653,7 +654,7 @@ function main(progressCount, movieObjs, isVisible, loadingThree, picked_movie_id
       case 0:
         currMovieGenre.value = 'sci_fi'
         gsap.to(currBgc, {
-          duration: 1,
+          duration: sceneChangeDuration,
           r: 33,
           g: 40,
           b: 42,
@@ -669,7 +670,7 @@ function main(progressCount, movieObjs, isVisible, loadingThree, picked_movie_id
         romanceFlag = true
         currMovieGenre.value = 'romance'
         gsap.to(currBgc, { 
-          duration: 1,
+          duration: sceneChangeDuration,
           r: 248,
           g: 165,
           b: 194,
@@ -684,7 +685,7 @@ function main(progressCount, movieObjs, isVisible, loadingThree, picked_movie_id
       case 2:
         currMovieGenre.value = 'animation'
         gsap.to(currBgc, {
-          duration: 1, 
+          duration: sceneChangeDuration, 
           r: 24,
           g: 28,
           b: 41,
@@ -699,6 +700,7 @@ function main(progressCount, movieObjs, isVisible, loadingThree, picked_movie_id
       case 3:
         currMovieGenre.value = 'action'
         gsap.to(currBgc, { 
+          duration: sceneChangeDuration,
           r: 127,
           g: 143,
           b: 166,
@@ -716,7 +718,7 @@ function main(progressCount, movieObjs, isVisible, loadingThree, picked_movie_id
       case 4:
         currMovieGenre.value = 'horror'
         gsap.to(currBgc, {
-          duration: 1,
+          duration: sceneChangeDuration,
           r: 5,
           g: 5,
           b: 5,
@@ -728,7 +730,7 @@ function main(progressCount, movieObjs, isVisible, loadingThree, picked_movie_id
             horrorFlag = true
             setTimeout(() => {
               horrorFlag = false
-            }, 15000)
+            }, 10000 * sceneChangeDuration)
           }
         })
         break
@@ -1011,7 +1013,7 @@ function main(progressCount, movieObjs, isVisible, loadingThree, picked_movie_id
     }
 
     // 2. Romance
-    if (camera.position.y < -0.8 * cameraScrollDist && camera.position.y > -1.2 * cameraScrollDist) {
+    if (camera.position.y < -0.5 * cameraScrollDist && camera.position.y > -1.5 * cameraScrollDist) {
       heartGroup.children.forEach((heart) => {
         heart.position.x += heart.speedX * 0.7
         heart.position.y += heart.speedY * 0.7
@@ -1026,18 +1028,18 @@ function main(progressCount, movieObjs, isVisible, loadingThree, picked_movie_id
     }
 
     // 3. Animation - animate pokemon
-    if (camera.position.y < -1.8 * cameraScrollDist && camera.position.y > -2.2 * cameraScrollDist) {
+    if (camera.position.y < -1.5 * cameraScrollDist && camera.position.y > -2.5 * cameraScrollDist) {
       if (playAnimation) {
         mixer.update(0.005)
         pokemon.position.x -= 0.09
-        if (pokemon.position.x < -120) {
+        if (pokemon.position.x < -180) {
           playAnimation = false
         }
       }
     }
 
     // 4. Action - load gun
-    if (camera.position.y < -2.8 * cameraScrollDist && camera.position.y > -3.2 * cameraScrollDist) {
+    if (camera.position.y < -2.5 * cameraScrollDist && camera.position.y > -3.5 * cameraScrollDist) {
       if (actionFlag) {
         if (gunReady === 0) {
           setTimeout(() => {
