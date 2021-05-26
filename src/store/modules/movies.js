@@ -59,7 +59,8 @@ const state = {
     music_score: 0,
     characters: 0,
     entertainment_value: 0,
-  }
+  },
+  allReviewsForMovie: []
 }
 
 const mutations = {
@@ -67,7 +68,6 @@ const mutations = {
     state.moviesObj = moviesObj
   },
   SET_PICKED_MOVIE(state, movie) {
-    console.log(movie)
     state.picked_movie = movie
   },
   SET_CURR_MOVIE_GENRE(state, currMovieGenre) {
@@ -99,6 +99,11 @@ const mutations = {
   UPDATE_MY_HEXA(state, hexa) {
     state.myHexa = hexa
   },
+
+  // Get all Movie Reviews
+  SET_ALL_REVIEWS_FOR_MOVIE(state, data) {
+    state.allReviewsForMovie = data
+  }
 }
 
 const actions = {
@@ -395,6 +400,21 @@ const actions = {
       .then((res) => {
         console.log(res.data)
         commit('UPDATE_MY_HEXA', res.data)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  },
+
+  // Get All Reviews for Movie
+  getReviewsForMovie({ commit }, movie_id) {
+    console.log(movie_id)
+    axios({
+      method: 'get',
+      url: moviesURL + `${movie_id}/review-sets/`,
+    })
+      .then((res) => {
+        commit('SET_ALL_REVIEWS_FOR_MOVIE', res.data)
       })
       .catch((err) => {
         console.log(err)

@@ -88,6 +88,7 @@ export default {
       // add hover event 
       myRater = rater({
         element:document.querySelector("#rater"),
+        starSize: '1rem',
         rateCallback:function rateCallback(rating, done) {
           // const messageP = document.querySelector('.my-rating-p') || document.querySelector('.my-rating-p-rated')
           // if not logged in
@@ -128,9 +129,11 @@ export default {
       })
       setTimeout(() => {
         myRater.setRating(mySimpleRatingFromStore.value)
+        console.log(document.querySelector('#rater'))
+        document.querySelector('#rater .star-value').style.setProperty('background', "url('../yellow_star.svg')")
+        document.querySelector('#rater .star-value').style.setProperty('background-size', '32px')
       }, 1000)
     })
-
     return {
       decodedToken,
       mySimpleRatingFromStore,

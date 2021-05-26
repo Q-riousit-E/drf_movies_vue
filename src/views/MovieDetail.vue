@@ -33,9 +33,12 @@
       <hr>
 
       <!-- Reviews -->
-      <h5 class="mb-3">Reviews <span>+ Add Review</span></h5>
+      <h5 class="mb-3">Reviews</h5>
+      <ReviewList />
+
     </div>
   </div>
+
   <!-- Add Review and Hexa Rating -->
   <ReviewModal 
     v-if="reviewModalOpened"
@@ -58,7 +61,11 @@ import MyRatingCharts from '@/components/MyRatingCharts.vue'
 import SimpleReviews from '@/components/SimpleReviews.vue'
 import DetailedReviews from '@/components/DetailedReviews.vue'
 
+import ReviewList from '@/components/ReviewList.vue'
+
 import ReviewModal from '@/components/ReviewModal.vue'
+
+
 
 
 export default {
@@ -70,6 +77,7 @@ export default {
     MyRatingCharts,
     SimpleReviews,
     DetailedReviews,
+    ReviewList,
     ReviewModal
   },
   setup() {
@@ -98,13 +106,13 @@ export default {
     }
     changePicked_movie()
 
-    // Get Comments Info
+    // Get My Comments Info
     const getMyRatings = () => {
       store.dispatch('movies/getMyComment', route.params.movie_id)
     }
     getMyRatings()
 
-    // Get Hexa Rating Info
+    // Get My Hexa Rating Info
     const getMyHexa = () => {
       store.dispatch('movies/getMyHexa', route.params.movie_id)
     }
@@ -131,6 +139,9 @@ export default {
       console.log('closeReviewModal')
       reviewModalOpened.value = false
     }
+
+    // Save all Reviews for Movie to Store
+    store.dispatch('movies/getReviewsForMovie', route.params.movie_id)
 
     return {
       onPromptLogin,

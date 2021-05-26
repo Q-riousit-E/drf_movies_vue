@@ -7,7 +7,11 @@
     <!-- Star Rating info -->
     <div 
       class="user-info" 
-      :class="{ reviewSelected: !hexaSelected && reviewSelected, hexaSelected: !reviewSelected && hexaSelected, bothSelected: reviewSelected && hexaSelected }"
+      :class="{ 
+        reviewSelected: (!hexaSelected && reviewSelected) || (!hexaDataFromStore && commentDataFromStore), 
+        hexaSelected: (!reviewSelected && hexaSelected) || (hexaDataFromStore && !commentDataFromStore), 
+        bothSelected: (reviewSelected && hexaSelected) || (hexaDataFromStore && commentDataFromStore)
+      }"
     >
       <h1><b>{{ decodedToken.username }}</b></h1>
       <h3>★ x {{ simpleRating }}</h3>
@@ -31,7 +35,6 @@
                   <i class="icon edit-icons fas fa-eraser" @click="handleDeleteComment"></i>
                 </div>
               </div>
-
             </div>
 
             <!-- input -->
@@ -172,6 +175,9 @@ export default {
     // 3. star + comment + hexa
     const submitCommentHexa = () => {
       console.log('submit star + comment + hexa')
+      store.dispatch('movies/updateComment', {movie_id: route.params.movie_id, comment: commentData.value})
+      store.dispatch('movies/updateHexa', {movie_id: route.params.movie_id, hexaData: hexaData.value})
+      closeReviewModal()
     }
 
     // onMounted
