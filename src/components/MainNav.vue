@@ -46,14 +46,9 @@
               <div class='d-flex'>
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" type="button" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <!-- {% if user.profile_img %} -->
-                    <!-- <img class="profile-img me-2" src="{{ user.profile_img.url }}" alt="{{ user.username }}'s profile image"> -->
                     {{ decodedToken.username }}
                   </a>
                   <ul class="dropdown-menu profile-dropdown" aria-labelledby="navbarDropdown">
-                    <li><a class="dropdown-item" href="#">Profile</a></li>
-                    <li><a class="dropdown-item" href="#">sth</a></li>
-                    <li><hr class="dropdown-divider"></li>
                     <li><button class="dropdown-item" @click="handleLogout">Logout</button></li>
                   </ul>
                 </li>
@@ -287,6 +282,8 @@ export default {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+
 .my-navbar {
   height: 5.5vh;
   z-index: 999;
@@ -301,6 +298,7 @@ export default {
 .my-brand {
   padding-left: 3vw;
   transition: all 1s;
+  font-family: 'Fredoka One', cursive;
 }
 
 .my-brand:hover {
