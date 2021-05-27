@@ -287,6 +287,8 @@ export default {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+
 .my-navbar {
   height: 5.5vh;
   z-index: 999;
@@ -301,6 +303,7 @@ export default {
 .my-brand {
   padding-left: 3vw;
   transition: all 1s;
+  font-family: 'Fredoka One', cursive;
 }
 
 .my-brand:hover {
