@@ -419,6 +419,42 @@ const actions = {
       .catch((err) => {
         console.log(err)
       })
+  },
+
+  // Comment comment CRUD
+  createComment({ commit, rootState }, {article_id, content}) {
+    console.log(article_id)
+    axios({
+      method: 'post',
+      url: articlesURL + `${article_id}/comments/`,
+      data: {
+        content
+      },
+      headers: {
+        Authorization: 'JWT ' + rootState.auth.token
+      },
+    })
+      .then((res) => {
+        console.log(res)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  },
+  deleteComment({ commit, rootState }, commentComment_id) {
+    axios({
+      method: 'delete',
+      url: `http://localhost:8000/api/v1/comments/${commentComment_id}/`,
+      headers: {
+        Authorization: 'JWT ' + rootState.auth.token
+      }
+    })
+      .then((res) => {
+        console.log(res)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
   }
 
 }

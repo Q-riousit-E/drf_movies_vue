@@ -57,7 +57,6 @@ export default {
     
     const simpleRatingDelete = () => {
       myRater.clear()
-      console.log(route.params.movie_id)
       store.dispatch('movies/deleteSimpleRating', route.params.movie_id)
     }
 
@@ -75,7 +74,6 @@ export default {
 
     // Logging in & Logging out
     watch(decodedToken, () => {
-      console.log('auth changed', decodedToken.value)
       readCurrSimpleRating()
     })
 
@@ -129,7 +127,6 @@ export default {
       })
       setTimeout(() => {
         myRater.setRating(mySimpleRatingFromStore.value)
-        console.log(document.querySelector('#rater'))
         document.querySelector('#rater .star-value').style.setProperty('background', "url('../yellow_star.svg')")
         document.querySelector('#rater .star-value').style.setProperty('background-size', '32px')
       }, 1000)

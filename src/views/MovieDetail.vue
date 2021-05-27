@@ -38,7 +38,7 @@
         <span class="add-review-span" @click="handleOpenReviewModal"><i class="far fa-plus-square mx-1" style="padding-bottom: 0.1rem"></i> Add a Review</span>
       </div>
     
-      <ReviewList />
+      <ReviewList @updateReviewData="updateReviewData"/>
 
     </div>
   </div>
@@ -119,6 +119,11 @@ export default {
     }
     getMyHexa()
 
+    const updateReviewData = () => {
+      console.log('data update')
+      store.dispatch('movies/getReviewsForMovie', route.params.movie_id)
+    }
+
     // Show Add Review
     const mySimpleRatingFromStore = computed(() => store.state.movies.simpleRating)
     const reviewModalOpened = ref(false)
@@ -147,6 +152,9 @@ export default {
     return {
       onPromptLogin,
       picked_movie,
+
+      // handed down emits
+      updateReviewData,
 
       // Review Modal
       reviewModalOpened, handleOpenReviewModal, handleCloseReviewModal,
