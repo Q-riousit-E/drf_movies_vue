@@ -1,7 +1,7 @@
 <template>
   <div class="rating-container">
     <div class="start-rating-container">
-      <div class="Stars" :style="`--rating: ${rating};`" aria-label="Rating of this product is 2.3 out of 5."></div>
+      <div class="stars" :style="`--rating: ${rating};`" aria-label="Rating of this product is 2.3 out of 5."></div>
     </div>
   </div>
 </template>
@@ -46,10 +46,10 @@ export default {
 :root {
   --star-size: 1rem;
   --star-color: #fff;
-  --star-background: rgb(14, 115, 149);
+  --star-background: rgb(211 196 62);
 }
 
-.Stars {
+.stars {
   --percent: calc(var(--rating) / 5 * 100%);
   
   display: inline-block;

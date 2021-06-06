@@ -69,6 +69,7 @@ export default {
     }
 
     const changeToSignup = (e) => {
+      e.preventDefault()
       console.log('change to signup', e.target)
       emit('changeToSignup')
     }
