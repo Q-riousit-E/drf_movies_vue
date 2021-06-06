@@ -90,6 +90,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
 
 import axios from 'axios'
+import { useRoute } from 'vue-router'
 
 export default {
   name: 'MainNav',
@@ -100,6 +101,7 @@ export default {
   setup() {
     // Get user info from store
     const store = useStore()
+    const route = useRoute()
     const decodedToken = computed(() => store.state.auth.decodedToken)
 
     // Login, Signup
@@ -127,6 +129,8 @@ export default {
     // Logout
     const handleLogout = () => {
       store.dispatch('auth/logout')
+      store.dispatch('movies/getMyComment', route.params.movie_id)
+      store.dispatch('movies/getMyHexa', route.params.movie_id)
     }
 
     // Search Movies
@@ -148,24 +152,28 @@ export default {
       const searchLabel = document.querySelector(".search-label");
       const xIconDiv = document.querySelector(".x-icon");
       const spinnerIcondiv = document.querySelector(".spinner-icon");
+      const check = document.querySelector("#check")
 
 
       // clicking searchLabel focuses searchInput
       searchLabel.addEventListener("click", () => {
         // Get Suggested Movies on click (REPEATED BUT WORKS FOR NOW)
-        store.dispatch('movies/get_suggested_movies')
-        searchInput.focus();
+        if (!check.checked) {
+          store.dispatch('movies/get_suggested_movies')
+          searchInput.focus();
+        }
       });
 
       // focus and focusout events on searchInput
       searchInput.addEventListener("focus", () => {
-        myPopover.classList.add("show-popover");
-        myPopover.classList.remove("invisible");
-        searchInput.classList.add("input-with-popover")
         setTimeout(() => {
+          myPopover.classList.add("show-popover");
+          myPopover.classList.remove("invisible");
+          searchInput.classList.add("input-with-popover")
           showSearchResults(suggestedMovies.value, true)
-        }, 1000)
+        }, 500)
       });
+      
       searchInput.addEventListener("focusout", () => {
         // use setTimeOut so a tag redirecting works for searched items
         setTimeout(() => {
@@ -238,7 +246,6 @@ export default {
 
       // show Search Results
       function showSearchResults(data, isSuggestion) {
-        console.log(data, isSuggestion)
         if (!isSuggestion) {
           searchedMovies.value = data
         }
@@ -257,7 +264,6 @@ export default {
           myPopover.classList.add("invisible");
           spinnerIcondiv.classList.add("invisible");
           searchLabel.classList.remove("invisible");
-
         }
       }
     })

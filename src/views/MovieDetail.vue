@@ -47,6 +47,7 @@
   <ReviewModal 
     v-if="reviewModalOpened"
     @closeReviewModal="handleCloseReviewModal"
+    @updateReviewData="updateReviewData"
   />
 </div>
 </template>

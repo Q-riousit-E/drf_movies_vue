@@ -97,7 +97,7 @@ export default {
   components: {
     HexaStarRating
   },
-  emits: ['closeReviewModal'],
+  emits: ['closeReviewModal', 'updateReviewData'],
   setup(props, { emit }) {
     // init
     const store = useStore()
@@ -140,6 +140,7 @@ export default {
       console.log('submit comment:', commentData.value)
       store.dispatch('movies/updateComment', {movie_id: route.params.movie_id, comment: commentData.value})
       // console.log(reviewSpan)
+      emit('updateReviewData')
       closeReviewModal()
     }
     const handleDeleteComment = (e) => {
@@ -156,6 +157,7 @@ export default {
     const handleSubmitHexa = () => {
       console.log('submit star + hexa', hexaData.value)
       store.dispatch('movies/updateHexa', {movie_id: route.params.movie_id, hexaData: hexaData.value})
+      emit('updateReviewData')
       closeReviewModal()
     }
     const handleDeleteHexa = () => {
@@ -179,6 +181,7 @@ export default {
       console.log('submit star + comment + hexa')
       store.dispatch('movies/updateComment', {movie_id: route.params.movie_id, comment: commentData.value})
       store.dispatch('movies/updateHexa', {movie_id: route.params.movie_id, hexaData: hexaData.value})
+      emit('updateReviewData')
       closeReviewModal()
     }
 
