@@ -77,8 +77,6 @@
     @changeToSignup="handleChangeToSignup"
     @changeToLogin="handleChangeToLogin"
   />
-  <!-- <p style="color: white">{{ suggestedMovies }}</p>
-  <p style="color: gray">{{ searchedMovies }}</p> -->
 </div>
 </template>
 
@@ -207,23 +205,12 @@ export default {
         // clear timeout if change within 0.5s
         clearTimeout(timeout);
         timeout = setTimeout(() => {
-          // delete all previous data in popover
-          // [...document.querySelectorAll(".popover-items")].forEach(item => {
-          //   item.remove();
-          // });
 
-          // if search_word != empty -> request search
           if (e.target.value) {
             searchRequest(e.target.value);
           } else {
             searchedMovies.value = []
             showSearchResults(suggestedMovies.value, true)
-            // myPopover.classList.remove("show-popover");
-            // myPopover.classList.add("invisible");
-            // searchInput.classList.remove("input-with-popover");
-            // xIconDiv.classList.add("invisible");
-            // spinnerIcondiv.classList.add("invisible");
-            // searchLabel.classList.remove("invisible");
           }
         }, 500);
       })

@@ -1,6 +1,8 @@
 import axios from 'axios'
 import jwt_decode from "jwt-decode";
 
+const url = process.env.VUE_APP_API_URL ? process.env.VUE_APP_API_URL : ''
+
 const state = {
   token: null,
   decodedToken: null,
@@ -23,7 +25,7 @@ const actions = {
     console.log(credentials)
     axios({
       method: 'post',
-      url: '/api/v1/accounts/signup/',
+      url: url + '/api/v1/accounts/signup/',
       data: credentials
     })
     .then((res) => {
@@ -38,7 +40,7 @@ const actions = {
     console.log(credentials)
     axios({
     method: 'post',
-    url: '/api/v1/accounts/login/',
+    url: url + '/api/v1/accounts/login/',
     data: credentials
   })
     .then((res) => {

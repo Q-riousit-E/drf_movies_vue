@@ -1,7 +1,9 @@
 import axios from 'axios'
 
-const moviesURL = 'http://localhost:8000/api/v1/movies/'
-const articlesURL = 'http://localhost:8000/api/v1/articles/'
+const localUrl = 'http://localhost:8000'
+const url = process.env.VUE_APP_API_URL ? process.env.VUE_APP_API_URL : localUrl
+const moviesURL = url + '/api/v1/movies/'
+const articlesURL = url + '/api/v1/articles/'
 
 const state = {
   moviesObj: null,
