@@ -2,8 +2,8 @@ import axios from 'axios'
 
 const localUrl = 'http://localhost:8000'
 // const url = process.env.VUE_APP_API_URL ? process.env.VUE_APP_API_URL : localUrl
-// const url = 'https://movietalk.site'
-const url = 'https://52.79.255.247'
+const url = 'https://movietalk.site'
+
 const moviesURL = url + '/api/v1/movies/'
 const articlesURL = url + '/api/v1/articles/'
 
