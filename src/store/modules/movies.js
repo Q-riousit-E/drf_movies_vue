@@ -1,7 +1,8 @@
 import axios from 'axios'
 
 const localUrl = 'http://localhost:8000'
-const url = process.env.VUE_APP_API_URL ? process.env.VUE_APP_API_URL : localUrl
+// const url = process.env.VUE_APP_API_URL ? process.env.VUE_APP_API_URL : localUrl
+const url = 'https://movietalk.site'
 const moviesURL = url + '/api/v1/movies/'
 const articlesURL = url + '/api/v1/articles/'
 
@@ -112,7 +113,7 @@ const actions = {
   getMovies({ commit }) {
     axios({
       method: 'get',
-      url: 'http://localhost:8000/api/v1/movies/index/'
+      url: url + '/api/v1/movies/index/'
     })
     .then((res) => {
       console.log(res)
@@ -446,7 +447,8 @@ const actions = {
   deleteComment({ commit, rootState }, commentComment_id) {
     axios({
       method: 'delete',
-      url: `http://localhost:8000/api/v1/comments/${commentComment_id}/`,
+      // url: `http://localhost:8000/api/v1/comments/${commentComment_id}/`,
+      url: url +`/api/v1/comments/${commentComment_id}/`,
       headers: {
         Authorization: 'JWT ' + rootState.auth.token
       }
