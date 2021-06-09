@@ -2,8 +2,8 @@ import axios from 'axios'
 import jwt_decode from "jwt-decode";
 
 // const url = process.env.VUE_APP_API_URL ? process.env.VUE_APP_API_URL : ''
-// const url = 'https://movietalk.site'
-const url = 'https://3.37.64.174'
+const url = 'https://api.movietalk.site'
+// const url = 'https://3.37.64.174'
 
 
 const state = {
