@@ -220,7 +220,7 @@ export default {
         console.log("seach for: ", query)
         axios({
           method: 'get',
-          url: "http://localhost:8000/api/v1/movie/search/",
+          url: "https://api.movietalk.site/api/v1/movie/search/",
           params: {'q': query},
         })
           .then((res) => {
