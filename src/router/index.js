@@ -46,7 +46,7 @@ const routes = [
     component: Testing
   },
   {
-    path: '/*/movies/:movie_id',
+    path: '/movies/:movie_id',
     name: 'MovieDetail',
     component: MovieDetail
   },
