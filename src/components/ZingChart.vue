@@ -1,6 +1,6 @@
 <template>
   <div id="myChart" class="chart--container">
-    <a class="zc-ref" href="https://www.zingchart.com/">Powered by ZingChart</a>
+    <a class="zc-ref" href="https://www.zingchart.com/"></a>
   </div>
 </template>
 
