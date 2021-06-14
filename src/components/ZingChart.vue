@@ -120,4 +120,8 @@ export default {
 .zc-ref {
   display: none;
 }
+
+#myChart-license-text {
+  display: none;
+}
 </style>
