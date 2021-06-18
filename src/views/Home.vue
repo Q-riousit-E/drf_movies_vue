@@ -19,11 +19,11 @@
 	</transition>
 
 	<!-- Movie Info Box -->
-  <!-- <transition name="switch"> -->
+  <transition name="switch">
 	<MovieInfoBox 
 		v-if="isVisible"
 	/>
-  <!-- </transition> -->
+  </transition>
 
 	<transition name="fade" mode="out-in">
 		<ScrollNav @onClickNavMenu="handleClickNavMenu" :currMovieGenre="currMovieGenre" v-show="!isVisible && !loadingThree" />
