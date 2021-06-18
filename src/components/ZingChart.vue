@@ -122,6 +122,6 @@ export default {
 }
 
 #myChart-license-text {
-  display: none;
+  display: none !important;
 }
 </style>
